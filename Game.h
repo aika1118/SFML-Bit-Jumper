@@ -8,9 +8,12 @@
 #include "Renderer.h"
 #include "Map.h"
 #include "Camera.h"
+#include "Physics.h"
+#include "Player.h"
 
 using namespace sf;
 using namespace std;
+
 
 class Game
 {
@@ -30,4 +33,5 @@ private:
 	Map& gameMap;
 	Image _mapImage; // 게임 배경화면
 	vector<Object*> _objects; // 게임 내 object 관리
+	Player player;
 };

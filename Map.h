@@ -4,10 +4,14 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <box2d/box2d.h>
 #include "Renderer.h"
 #include "Object.h"
 #include "Resources.h"
 #include "Config.h"
+#include "physics.h"
+#include "FixtureData.h"
+
 
 using namespace sf;
 

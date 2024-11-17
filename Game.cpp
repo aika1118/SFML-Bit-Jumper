@@ -13,6 +13,7 @@ Game& Game::getInstance()
 
 void Game::Begin(const RenderWindow& window)
 {
+	Physics::Init();
 
 	for (const auto& file : filesystem::directory_iterator("./resources/textures/")) // 해당 경로에 있는 모든 texture 불러오기
 	{
@@ -28,16 +29,22 @@ void Game::Begin(const RenderWindow& window)
 
 	_mapImage.loadFromFile("./resources/images/map.png");
 
-	camera._position = gameMap.CreateFromImage(_mapImage, _objects);
+	player._position = gameMap.CreateFromImage(_mapImage, _objects);
+	player.Begin();
 }
 
 void Game::Update(float deltaTime)
 {
-
+	Physics::Update(deltaTime);
+	player.Update(deltaTime);
+	camera._position = player._position;
 }
 
 void Game::Render(Renderer& renderer)
 {
 	renderer._target.setView(camera.getView(renderer._target.getSize()));
 	gameMap.Draw(renderer);
+	player.Draw(renderer);
+
+	Physics::DebugDraw(renderer);
 }

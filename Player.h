@@ -1,0 +1,42 @@
+// File: Player.h
+// Purpose: 플레이어 관리
+
+#pragma once
+
+#include <SFML/Graphics.hpp>
+#include <box2d/box2d.h>
+#include <iostream>
+#include "Renderer.h"
+#include "Physics.h"
+#include "Resources.h"
+#include "ContactListener.h"
+#include "FixtureData.h"
+
+using namespace sf;
+using namespace std;
+
+class Player : public ContactListener
+{
+public:
+	void Begin();
+	void Update(float deltaTime);
+	void Draw(Renderer& renderer);
+
+	virtual void OnBeginContact(b2Fixture* self, b2Fixture* other) override;
+	virtual void OnEndContact(b2Fixture* self, b2Fixture* other) override;
+
+	Vector2f _position;
+	float _angle;
+
+private:
+	bool canJump();
+	
+	b2Body* body;
+	bool _facingLeft = false; // 캐릭터가 왼쪽을 바라보고 있는지 체크 (x축 속도의 부호로 판별)
+	int _groundContactCount = 0; // 여러 mapTile과 겹친 상태에서 일부 타일만 접촉 해제됐을 때도 땅에 붙어있음을 판별하기 위해 int로 관리
+	int _jumpCount = 0;
+	bool _isJumping = false;
+
+	FixtureData _fixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
+	FixtureData _sensorFixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
+};
