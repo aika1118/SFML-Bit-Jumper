@@ -29,13 +29,13 @@ public:
 	float _angle;
 
 private:
-	bool canJump();
-	
+
 	b2Body* body;
 	bool _facingLeft = false; // 캐릭터가 왼쪽을 바라보고 있는지 체크 (x축 속도의 부호로 판별)
 	int _groundContactCount = 0; // 여러 mapTile과 겹친 상태에서 일부 타일만 접촉 해제됐을 때도 땅에 붙어있음을 판별하기 위해 int로 관리
 	int _jumpCount = 0;
 	bool _isJumping = false;
+	bool _previousSpaceState = false; // 프레임 별로 keyDown, keyReleased 판별을 위한 상태변수
 
 	FixtureData _fixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
 	FixtureData _sensorFixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착

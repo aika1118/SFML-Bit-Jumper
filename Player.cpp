@@ -44,8 +44,6 @@ void Player::Begin()
 
 void Player::Update(float deltaTime)
 {
-	cout << _jumpCount << endl;
-
 	_position = Vector2f(body->GetPosition().x, body->GetPosition().y); // Physics::Update()에서 world.Step에 의해 프레임 당 물리 계산 적용중, 이로 인해 body position 변화 발생
 	_angle = body->GetAngle() * (180.f / M_PI); // 라디안에서 도(degree) 변환
 
@@ -62,10 +60,37 @@ void Player::Update(float deltaTime)
 	if (Keyboard::isKeyPressed(Keyboard::Left))
 		velocity.x -= move;
 
-	if (Keyboard::isKeyPressed(Keyboard::Space) && canJump())
+	// PLAYER_MAX_JUMP_COUNT 횟수만큼 점프 가능하도록 구현 (최초 점프는 땅에서만 가능)
+
+	bool currentSpaceState = Keyboard::isKeyPressed(Keyboard::Space); // 프레임 별로 keyDown, keyReleased 판별을 위한 상태변수
+
+	// KeyDown: Space 키가 눌렸고, 이전 프레임에서는 떼어져 있었다면
+	if (currentSpaceState && !_previousSpaceState) 
 	{
-		velocity.y = PLAYER_JUMP_VELOCITY;
+		if (_groundContactCount > 0) // 최초 땅에서 점프하는 순간
+		{
+			velocity.y = PLAYER_JUMP_VELOCITY;
+			_isJumping = true;
+		}
+
+		else if (1 <= _jumpCount && _jumpCount < PLAYER_MAX_JUMP_COUNT) // 이미 점프한 후 연속 점프 시도 상황
+		{
+			velocity.y = PLAYER_JUMP_VELOCITY;
+			_isJumping = true;
+		}
 	}
+
+	// KeyReleased: Space 키가 떼어졌을 때
+	if (!currentSpaceState && _previousSpaceState) {
+		if (_isJumping) // space 키다운으로 유효한 점프 상황에서 key released 되었을 때 (그냥 땅에서 떨어지며 공중에서 점프하는 것 방지)
+		{
+			++_jumpCount;
+			_isJumping = false;
+		}
+	}
+
+	_previousSpaceState = currentSpaceState;
+	
 	
 	if (velocity.x < -0.02f)
 		_facingLeft = true;
@@ -90,7 +115,12 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 
 	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile) // player가 mapTile과 닿아있는 경우
 	{
-		++_groundContactCount;
+		++_groundContactCount; 
+
+		// jump 상태 초기화
+		_jumpCount = 0; 
+		_isJumping = false;
+
 		return;
 	}
 
@@ -109,9 +139,4 @@ void Player::OnEndContact(b2Fixture* self, b2Fixture* other)
 		_groundContactCount = _groundContactCount > 0 ? --_groundContactCount : _groundContactCount;
 		return;
 	}
-}
-
-bool Player::canJump()
-{
-	return _groundContactCount > 0;
 }
