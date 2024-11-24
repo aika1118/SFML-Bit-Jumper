@@ -6,10 +6,12 @@
 
 int main()
 {
-	RenderWindow window(VideoMode(1366, 768), "Project W");
+	RenderWindow window(VideoMode(1366, 768), "Project W", Style::Titlebar | Style::Close); // 마우스 드래그로 창 크기 조절 불가
 	Clock deltaClock;
 	Game &game = Game::getInstance();
 	Renderer renderer(window); // 렌더링될 타겟을 window로 지정
+
+	//window.setFramerateLimit(60);
 
 	game.Begin(window);
 	
@@ -23,12 +25,6 @@ int main()
 		{
 			if (event.type == Event::Closed)
 				window.close();
-
-			//if (event.type == Event::Resized) // 창 크기 변할 때 View 재조정
-			//{
-			//	FloatRect visibleArea(0.f, 0.f, (float)event.size.width, (float)event.size.height);
-			//	window.setView(View(window.getView().getCenter(), sf::Vector2f((float)event.size.width, (float)event.size.height)));
-			//}
 		}
 
 		window.clear();
@@ -36,6 +32,7 @@ int main()
 
 		game.Update(deltaTime);
 		game.Render(renderer);
+		game.RenderUI(renderer);
 
 		window.display();
 	}

@@ -14,6 +14,7 @@ enum class FixtureDataType
 	Player,
 	PlayerSensor,
 	MapTile,
+	SaveTile,
 	Object
 };
 

@@ -11,6 +11,8 @@
 #include "Config.h"
 #include "physics.h"
 #include "FixtureData.h"
+#include "Coin.h"
+#include "Enemy.h"
 
 
 using namespace sf;
@@ -20,7 +22,7 @@ class Map
 public:
 	static Map& getInstance(); // 싱글톤
 
-	Vector2f CreateFromImage(const Image& image, vector<Object*>& objects); // 도트 이미지 기반으로 맵 생성 (libresprite 툴 사용)
+	void CreateFromImage(const Image& image, vector<Object*>& objects); // 도트 이미지 기반으로 맵 생성 (libresprite 툴 사용)
 
 	void Draw(Renderer& renderer);
 

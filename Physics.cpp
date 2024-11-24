@@ -7,7 +7,7 @@ vector<b2Body*> Physics::bodiesToDestroy; // static 정의
 void Physics::Init()
 {
 	if (world)
-		delete world; // 기존 world 초기화
+		delete world; // 기존 world 초기화 (b2Body 관련 리소스도 안전하게 정리)
 
 	world = new b2World(b2Vec2(WORLD_GRAVITY_X, WORLD_GRAVITY_Y));
 	world->SetDebugDraw(debugDraw);
@@ -22,7 +22,10 @@ void Physics::Update(float deltaTime)
 	
 	// Step 이후 삭제 대기 리스트 처리 (step중 destroy 할 수 없기 때문에 이렇게 처리)
 	for (b2Body* body : bodiesToDestroy)
+	{
+		// body->GetUserData().pointer 에 동적할당된 객체도 delete 해줘야 하지 않을까?
 		Physics::world->DestroyBody(body);
+	}
 
 	bodiesToDestroy.clear();
 }

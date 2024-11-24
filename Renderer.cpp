@@ -5,6 +5,7 @@ Renderer::Renderer(RenderTarget& target)
 {
 }
 
+// texture 중심을 position으로 설정하고 size 크기만큼 그리기
 void Renderer::Draw(const Texture& texture, const Vector2f& position, const Vector2f& size, float angle)
 {
 	_sprite.setTexture(texture, true); // 새로운 텍스처의 크기에 맞춰서 스프라이트가 렌더링

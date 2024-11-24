@@ -11,6 +11,9 @@
 #include "Resources.h"
 #include "ContactListener.h"
 #include "FixtureData.h"
+#include "Animation.h"
+#include "Coin.h"
+#include "Enemy.h"
 
 using namespace sf;
 using namespace std;
@@ -21,6 +24,7 @@ public:
 	void Begin();
 	void Update(float deltaTime);
 	void Draw(Renderer& renderer);
+	~Player();
 
 	virtual void OnBeginContact(b2Fixture* self, b2Fixture* other) override;
 	virtual void OnEndContact(b2Fixture* self, b2Fixture* other) override;
@@ -28,7 +32,12 @@ public:
 	Vector2f _position;
 	float _angle;
 
+	int _hp;
+	bool _isDead;
+
 private:
+	Animation _runAnimation;
+	Texture _textureToDraw;
 
 	b2Body* body;
 	bool _facingLeft = false; // 캐릭터가 왼쪽을 바라보고 있는지 체크 (x축 속도의 부호로 판별)
@@ -37,6 +46,9 @@ private:
 	bool _isJumping = false;
 	bool _previousSpaceState = false; // 프레임 별로 keyDown, keyReleased 판별을 위한 상태변수
 
+	int _coins = 0;
+
 	FixtureData _fixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
 	FixtureData _sensorFixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
+
 };

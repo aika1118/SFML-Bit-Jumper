@@ -7,6 +7,8 @@
 #include "Config.h"
 
 using namespace sf;
+using namespace std;
+
 
 class Camera
 {
@@ -14,8 +16,8 @@ public:
 	static Camera& getInstance(); // 싱글톤
 
 	Vector2f getViewSize();
-	View getView(Vector2u windowSize); // 현재 windowSize 종횡비에 맞는 view 반환
-	
+	View getView(Vector2u windowSize); // 현재 windowSize 종횡비에 맞는 view 반환, 맵 바깥을 벗어나지 않는 view 반환
+	View getUIView(); // UI 렌더링을 위한 view 반환
 	float _zoomLevel; // view 크기
 	Vector2f _position; // view 중심
 

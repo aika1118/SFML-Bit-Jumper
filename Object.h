@@ -2,10 +2,9 @@
 // Purpose: 게임 내 Object 관리를 위한 부모 class
 
 #pragma once
-#include <string>
+#include "Renderer.h" // 상속받은 class에서 Render()를 구현하며 Renderer.h 선언이 필요할 것 (ex. renderer.Draw())
 
 class b2Body;
-class Renderer;
 
 using namespace std;
 
@@ -20,4 +19,5 @@ public:
 	string _tag; // object 구분을 위한 tag
 	float _angle;
 	b2Body* _body;
+	Vector2f _position;
 };

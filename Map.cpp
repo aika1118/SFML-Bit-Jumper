@@ -1,4 +1,5 @@
 #include "Map.h"
+#include "Game.h"
 
 Map::Map()
 {
@@ -10,7 +11,7 @@ Map& Map::getInstance()
     return instance;
 }
 
-Vector2f Map::CreateFromImage(const Image& image, vector<Object*>& objects)
+void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 {
     _grid.clear();
     _grid = vector<vector<Texture*>>(image.getSize().x, vector<Texture*>(image.getSize().y, nullptr));
@@ -21,7 +22,7 @@ Vector2f Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 
     for (int x = 0; x < _grid.size(); ++x)
     {
-        for (int y = 0; y < _grid[x].size(); ++y)
+        for (int y = 0; y < _grid[x].size(); ++y) 
         {
             Color color = image.getPixel(x, y);
             if (color == Color::White) // 그냥 배경인 경우
@@ -30,40 +31,99 @@ Vector2f Map::CreateFromImage(const Image& image, vector<Object*>& objects)
             Object* object = nullptr;
 
             if (color == Color::Red)
-                playerPosition = Vector2f(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f);
+            {
+                Game::getInstance()._playerPosition = Vector2f(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f);
+                continue;
+            }
 
             if (color == Color::Black)
                 _grid[x][y] = &Resources::_textures["block.png"];
 
-            b2BodyDef bodyDef; // 타일의 물리적 몸체 정의
-            bodyDef.position.Set(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f);
-            b2Body* body = Physics::world->CreateBody(&bodyDef); // body = 새로 생성된 몸체에 대해 포인터로 참조가능
+            else if (color == Color::Yellow)
+                object = new Coin();
 
-            // Ghost Collision 회피를 위한 chainShape 사용 (타일 경계 부근에서 캐릭터가 끼이는 현상 방지)
-            // 타일모양대로 사각형 충돌체 그리기 (0 ~ 4 순서대로 이어지니 이점 유의)
-            vector<b2Vec2> vs(4);
-            vs[0].Set(-_cellSize / 2.f, -_cellSize / 2.f);
-            vs[1].Set(+_cellSize / 2.f, -_cellSize / 2.f);
-            vs[2].Set(+_cellSize / 2.f, +_cellSize / 2.f);
-            vs[3].Set(-_cellSize / 2.f, +_cellSize / 2.f);
+            else if (color == Color::Blue)
+                object = new Enemy();
+            else if (color == Color::Green)
+                _grid[x][y] = &Resources::_textures["save.png"];
+                
 
-            b2ChainShape chain;
-            chain.CreateLoop(&vs[0], 4);
+            else
+                continue;
 
-            FixtureData* fixtureData = new FixtureData();
-            fixtureData->type = FixtureDataType::MapTile;
-            fixtureData->mapX = x;
-            fixtureData->mapY = y;
+            if (object)
+            {
+                object->_position = Vector2f(_cellSize * x + _cellSize / 2.f, _cellSize* y + _cellSize / 2.f);
+                objects.push_back(object);
+                continue;
+            }
 
-            b2FixtureDef fixtureDef;
-            fixtureDef.userData.pointer = (uintptr_t)fixtureData;
-            fixtureDef.density = 0.f;
-            fixtureDef.shape = &chain;
-            body->CreateFixture(&fixtureDef);
+            if (_grid[x][y] == &Resources::_textures["block.png"])
+            {
+                b2BodyDef bodyDef; // 타일의 물리적 몸체 정의
+                bodyDef.position.Set(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f);
+                b2Body* body = Physics::world->CreateBody(&bodyDef); // body = 새로 생성된 몸체에 대해 포인터로 참조가능
+
+                // Ghost Collision 회피를 위한 chainShape 사용 (타일 경계 부근에서 캐릭터가 끼이는 현상 방지)
+                // 타일모양대로 사각형 충돌체 그리기 (0 ~ 4 순서대로 이어지니 이점 유의)
+                vector<b2Vec2> vs(4);
+                vs[0].Set(-_cellSize / 2.f, -_cellSize / 2.f);
+                vs[1].Set(+_cellSize / 2.f, -_cellSize / 2.f);
+                vs[2].Set(+_cellSize / 2.f, +_cellSize / 2.f);
+                vs[3].Set(-_cellSize / 2.f, +_cellSize / 2.f);
+
+                b2ChainShape chain;
+                chain.CreateLoop(&vs[0], 4);
+
+                FixtureData* fixtureData = new FixtureData();
+                fixtureData->type = FixtureDataType::MapTile;
+                fixtureData->mapX = x;
+                fixtureData->mapY = y;
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.userData.pointer = (uintptr_t)fixtureData;
+                fixtureDef.density = 0.f;
+                fixtureDef.shape = &chain;
+                body->CreateFixture(&fixtureDef);
+
+                continue;
+            }
+
+
+            // 세이브포인트인 경우
+            if (_grid[x][y] == &Resources::_textures["save.png"])
+            {
+                b2BodyDef bodyDef; // 타일의 물리적 몸체 정의
+                bodyDef.position.Set(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f);
+                b2Body* body = Physics::world->CreateBody(&bodyDef); // body = 새로 생성된 몸체에 대해 포인터로 참조가능
+
+                b2FixtureDef sensorFixtureDef;
+                b2PolygonShape sensorPolygonShape;
+                FixtureData* fixtureData = new FixtureData();
+
+                fixtureData->type = FixtureDataType::SaveTile;
+                fixtureData->mapX = x;
+                fixtureData->mapY = y;
+
+                sensorFixtureDef.userData.pointer = (uintptr_t)fixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
+                sensorPolygonShape.SetAsBox(_cellSize / 2.f, _cellSize / 2.f);
+                sensorFixtureDef.isSensor = true; // sensor : 충돌을 감지하지만 물리적인 상호작용은 하지 않는 특수한 fixture
+                sensorFixtureDef.shape = &sensorPolygonShape;
+
+                body->CreateFixture(&sensorFixtureDef);
+            }
+            
         }
     }
 
-    return playerPosition;
+    int saveX = Game::getInstance()._savePositionX;
+    int saveY = Game::getInstance()._savePositionY;
+    // 세이브 포인트가 존재하는 경우
+    if (saveX || saveY)
+    {
+        Game::getInstance()._playerPosition = Vector2f(_cellSize * saveX + _cellSize / 2.f, _cellSize * saveY + _cellSize / 2.f);
+        _grid[saveX][saveY] = &Resources::_textures["save_used.png"];
+    }
 }
 
 void Map::Draw(Renderer& renderer)

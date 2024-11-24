@@ -1,7 +1,24 @@
 #include "Player.h"
+#include "Game.h" // 순환참조 회피
 
 void Player::Begin()
 {
+	// Animation Frame 정의
+	_runAnimation = Animation(1.1f,
+		{
+			AnimFrame(0.1f, Resources::_textures["walk0001.png"]),
+			AnimFrame(0.2f, Resources::_textures["walk0002.png"]),
+			AnimFrame(0.3f, Resources::_textures["walk0003.png"]),
+			AnimFrame(0.4f, Resources::_textures["walk0004.png"]),
+			AnimFrame(0.5f, Resources::_textures["walk0005.png"]),
+			AnimFrame(0.6f, Resources::_textures["walk0006.png"]),
+			AnimFrame(0.7f, Resources::_textures["walk0007.png"]),
+			AnimFrame(0.8f, Resources::_textures["walk0008.png"]),
+			AnimFrame(0.9f, Resources::_textures["walk0009.png"]),
+			AnimFrame(1.0f, Resources::_textures["walk0010.png"])
+		});
+
+
 	b2BodyDef bodyDef; // 물리적 몸체 정의
 	b2FixtureDef fixtureDef;
 
@@ -40,10 +57,16 @@ void Player::Begin()
 	sensorFixtureDef.shape = &sensorPolygonShape;
 
 	body->CreateFixture(&sensorFixtureDef);
+
+	// 이외 멤버함수 초기화
+	_hp = 3;
+	_isDead = false;
 }
 
 void Player::Update(float deltaTime)
 {
+	_runAnimation.Update(deltaTime);
+
 	_position = Vector2f(body->GetPosition().x, body->GetPosition().y); // Physics::Update()에서 world.Step에 의해 프레임 당 물리 계산 적용중, 이로 인해 body position 변화 발생
 	_angle = body->GetAngle() * (180.f / M_PI); // 라디안에서 도(degree) 변환
 
@@ -56,12 +79,12 @@ void Player::Update(float deltaTime)
 	velocity.x = 0.f;
 
 	if (Keyboard::isKeyPressed(Keyboard::Right))
-		velocity.x += move;
+		velocity.x = +move;
 	if (Keyboard::isKeyPressed(Keyboard::Left))
-		velocity.x -= move;
+		velocity.x = -move;
 
 	// PLAYER_MAX_JUMP_COUNT 횟수만큼 점프 가능하도록 구현 (최초 점프는 땅에서만 가능)
-
+	 
 	bool currentSpaceState = Keyboard::isKeyPressed(Keyboard::Space); // 프레임 별로 keyDown, keyReleased 판별을 위한 상태변수
 
 	// KeyDown: Space 키가 눌렸고, 이전 프레임에서는 떼어져 있었다면
@@ -90,19 +113,32 @@ void Player::Update(float deltaTime)
 	}
 
 	_previousSpaceState = currentSpaceState;
+
+	// 현재 time에 따라 draw할 texture 얻기
+	_textureToDraw = _runAnimation.GetTexture();
 	
 	
 	if (velocity.x < -0.02f)
 		_facingLeft = true;
 	else if (velocity.x > 0.02f)
 		_facingLeft = false;
+	else
+		_textureToDraw = Resources::_textures["idle.png"]; // 캐릭터가 정지중일 때 적용할 animation texture
+
+	if (_groundContactCount <= 0)
+		_textureToDraw = Resources::_textures["jump.png"]; // 캐릭터가 점프중일 때 (지면에 없을 떄) 적용할 animation texture
+
 
 	body->SetLinearVelocity(velocity);
 }
 
 void Player::Draw(Renderer& renderer)
 {
-	renderer.Draw(Resources::_textures["idle.png"], _position, Vector2f(_facingLeft ? -1.f : 1.f, PLAYER_NORMALIZED_HEIGHT), _angle); // 캐릭터가 왼쪽 바라보면 size.x에 음수 적용
+	renderer.Draw(_textureToDraw, _position, Vector2f(_facingLeft ? -1.f : 1.f, PLAYER_NORMALIZED_HEIGHT), _angle); // 캐릭터가 왼쪽 바라보면 size.x에 음수 적용
+}
+
+Player::~Player()
+{
 }
 
 void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
@@ -113,7 +149,8 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 	if (!selfData) return;
 	if (!otherData)	return;
 
-	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile) // player가 mapTile과 닿아있는 경우
+	// player가 mapTile과 닿아있는 경우
+	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile) 
 	{
 		++_groundContactCount; 
 
@@ -124,6 +161,72 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
+	// player가 coin과 충돌한 경우
+	if (selfData->type == FixtureDataType::Player && otherData->type == FixtureDataType::Object && otherData->object->_tag == "coin")
+	{
+		Coin* coin = dynamic_cast<Coin*>(otherData->object); // 안전하게 다운 캐스팅 (otherData->object가 Coin*이 아닐경우 nullptr 반환)
+		if (!coin)
+			return;
+		
+		coin->destroyBody(); // world에서 body를 destroy (정확히는 삭제 대기리스트에만 일단 추가 후 Physics에서 step 계산 후 일괄적으로 destroyBody 진행)
+		Game::getInstance().DeleteObject(otherData->object); // object를 destroy하여 더이상 해당 object에 대해 update, render되지 않도록 함
+
+		++_coins;
+
+		cout << "coins = " << _coins << endl;
+
+		return;
+	}
+
+	// player가 적과 충돌한 경우
+	if (otherData->type == FixtureDataType::Object && otherData->object->_tag == "enemy")
+	{
+		Enemy* enemy = dynamic_cast<Enemy*>(otherData->object);
+		if (!enemy)
+			return;
+
+		// player 발 밑 센서로 적과 충돌한 경우 물리적 몸체만 먼저 destroy
+		// texture는 일정시간 동안 죽은 모습으로 계속 그림 (이후 objects에서 delete 처리 될 예정)
+		if (selfData->type == FixtureDataType::PlayerSensor)
+			enemy->destroyBody();
+
+		// enemy가 살아있고 player가 적과 일반적으로 충돌한 경우 피격처리
+		else if (enemy->IsDead() == false)
+		{
+			_hp = max(0, _hp - 1);
+			cout << _hp << endl;
+
+			if (_hp <= 0)
+				_isDead = true;
+		}
+
+		return;
+	}
+
+	// player가 save 타일과 충돌한 경우
+	// 최근에 충돌한 save 타일에 리스폰 위치 지정하는 작업
+	if (selfData->type == FixtureDataType::Player && otherData->type == FixtureDataType::SaveTile)
+	{
+		int preSaveX = Game::getInstance()._savePositionX;
+		int preSaveY = Game::getInstance()._savePositionY;
+		int curSaveX = otherData->mapX;
+		int curSaveY = otherData->mapY;
+		
+		// 이전에 세이브한 장소와 동일한 경우 바로 return 처리
+		if (preSaveX == curSaveX && preSaveY == curSaveY)
+			return;
+
+		// 현재 세이브 장소의 texture를 save_used.png로 변경
+		Map::getInstance()._grid[curSaveX][curSaveY] = &Resources::_textures["save_used.png"];
+
+		// 이전 세이브 기록이 있는 경우 이전 세이브 블록을 원본으로 돌려놓음
+		if (preSaveX || preSaveY)
+			Map::getInstance()._grid[preSaveX][preSaveY] = &Resources::_textures["save.png"];
+
+		// 최근 세이브 장소를 Game 클래스에 기록
+		Game::getInstance()._savePositionX = curSaveX;
+		Game::getInstance()._savePositionY = curSaveY;
+	}
 }
 
 void Player::OnEndContact(b2Fixture* self, b2Fixture* other)
