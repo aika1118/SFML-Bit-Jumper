@@ -70,6 +70,11 @@ float Game::getPlayerAngle()
 	return player._angle;
 }
 
+bool Game::getPlayerFacingLeft()
+{
+	return player._facingLeft;
+}
+
 void Game::Restart()
 {
 	InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)

@@ -43,6 +43,8 @@ public:
 	int _hp;
 	bool _isDead;
 
+	bool _facingLeft = false; // 캐릭터가 왼쪽을 바라보고 있는지 체크 (x축 속도의 부호로 판별)
+
 private:
 	void HandleMove(float deltaTime, b2Vec2& velocity);
 	void HandleJump(b2Vec2& velocity);
@@ -52,7 +54,6 @@ private:
 	Texture _textureToDraw;
 
 	b2Body* body;
-	bool _facingLeft = false; // 캐릭터가 왼쪽을 바라보고 있는지 체크 (x축 속도의 부호로 판별)
 	int _groundContactCount = 0; // 여러 mapTile과 겹친 상태에서 일부 타일만 접촉 해제됐을 때도 땅에 붙어있음을 판별하기 위해 int로 관리
 	int _jumpCount = 0;
 	bool _isJumping = false;
