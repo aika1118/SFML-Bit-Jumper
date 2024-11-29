@@ -14,9 +14,17 @@
 #include "Animation.h"
 #include "Coin.h"
 #include "Enemy.h"
+#include "SkillManager.h"
 
 using namespace sf;
 using namespace std;
+
+enum class PlayerStatus { // PlayerStatus 접근자로만 접근 가능
+	Idle,
+	Moving,
+	Jumping,
+	Attacking
+};
 
 class Player : public ContactListener
 {
@@ -36,6 +44,10 @@ public:
 	bool _isDead;
 
 private:
+	void HandleMove(float deltaTime, b2Vec2& velocity);
+	void HandleJump(b2Vec2& velocity);
+	void HandleSkill(float deltaTime, b2Vec2& velocity);
+
 	Animation _runAnimation;
 	Texture _textureToDraw;
 
@@ -51,4 +63,6 @@ private:
 	FixtureData _fixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
 	FixtureData _sensorFixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
 
+	PlayerStatus _playerStatus;
+	int _currentSkillId;
 };

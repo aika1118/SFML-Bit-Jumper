@@ -1,5 +1,6 @@
 #include "Game.h"
 
+
 Game::Game() // 싱글톤 객체 (정적 인스턴스) 생성 시 기본 생성자 필요
 	:gameMap(Map::getInstance()), camera(Camera::getInstance())
 {
@@ -10,6 +11,7 @@ Game& Game::getInstance()
 	static Game instance; // 인스턴스는 최초 호출 시에만 생성됨
 	return instance;
 }
+
 
 void Game::Begin(const RenderWindow& window)
 {
@@ -40,8 +42,32 @@ void Game::Begin(const RenderWindow& window)
 	playerHpText.setOutlineThickness(1.f);
 	playerHpText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
 
+	InitSkill();
 
 	Restart();
+}
+
+void Game::InitSkill()
+{
+	// 근접공격 skill 초기화
+	int meleeStart = (int)SkillList::MELEE_START;
+	int meleeEnd = (int)SkillList::MELEE_END;
+
+	for (int skillId = meleeStart + 1; skillId < meleeEnd; ++skillId)
+	{
+		Skill* skill = new SkillMeleeAttack(skillId); // skillId에 따라 스킬 고유한 객체 생성
+		SkillManager::getInstance().AddSkill(skillId, skill); // skillId에 매핑하여 skill을 unordered_map에 추가
+	}
+}
+
+Vector2f Game::getPlayerPosition()
+{
+	return player._position;
+}
+
+float Game::getPlayerAngle()
+{
+	return player._angle;
 }
 
 void Game::Restart()

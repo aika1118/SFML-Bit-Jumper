@@ -10,6 +10,8 @@
 #include "Camera.h"
 #include "Physics.h"
 #include "Player.h"
+#include "SkillManager.h"
+#include "SkillMeleeAttack.h"
 
 using namespace sf;
 using namespace std;
@@ -35,6 +37,11 @@ public:
 	Vector2f _playerPosition;
 	int _savePositionX = 0;
 	int _savePositionY = 0;
+
+	void InitSkill();
+
+	Vector2f getPlayerPosition(); // player의 현재 position 반환
+	float getPlayerAngle(); // player의 현재 angle 반환
 
 
 private:

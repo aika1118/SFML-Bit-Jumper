@@ -143,6 +143,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="SkillMeleeAttack.cpp" />
     <ClCompile Include="MyDebugDraw.cpp" />
     <ClCompile Include="MyGlobalContactListener.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -150,6 +151,8 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resources.cpp" />
+    <ClCompile Include="Skill.cpp" />
+    <ClCompile Include="SkillManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -161,6 +164,7 @@
     <ClInclude Include="FixtureData.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="SkillMeleeAttack.h" />
     <ClInclude Include="MyDebugDraw.h" />
     <ClInclude Include="MyGlobalContactListener.h" />
     <ClInclude Include="Object.h" />
@@ -168,6 +172,8 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Resources.h" />
+    <ClInclude Include="Skill.h" />
+    <ClInclude Include="SkillManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\images\map.png" />

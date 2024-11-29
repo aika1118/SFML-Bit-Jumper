@@ -61,79 +61,29 @@ void Player::Begin()
 	// 이외 멤버함수 초기화
 	_hp = 3;
 	_isDead = false;
+	_playerStatus = PlayerStatus::Idle;
 }
 
 void Player::Update(float deltaTime)
 {
-	_runAnimation.Update(deltaTime);
-
 	_position = Vector2f(body->GetPosition().x, body->GetPosition().y); // Physics::Update()에서 world.Step에 의해 프레임 당 물리 계산 적용중, 이로 인해 body position 변화 발생
 	_angle = body->GetAngle() * (180.f / M_PI); // 라디안에서 도(degree) 변환
-
-	float move = PLAYER_MOVE_VELOCITY;
-
-	if (Keyboard::isKeyPressed(Keyboard::LShift)) // shift 키다운 시 이동속도 2배
-		move *= 2;
-
 	b2Vec2 velocity = body->GetLinearVelocity();
-	velocity.x = 0.f;
-
-	if (Keyboard::isKeyPressed(Keyboard::Right))
-		velocity.x = +move;
-	if (Keyboard::isKeyPressed(Keyboard::Left))
-		velocity.x = -move;
-
-	// PLAYER_MAX_JUMP_COUNT 횟수만큼 점프 가능하도록 구현 (최초 점프는 땅에서만 가능)
-	 
-	bool currentSpaceState = Keyboard::isKeyPressed(Keyboard::Space); // 프레임 별로 keyDown, keyReleased 판별을 위한 상태변수
-
-	// KeyDown: Space 키가 눌렸고, 이전 프레임에서는 떼어져 있었다면
-	if (currentSpaceState && !_previousSpaceState) 
-	{
-		if (_groundContactCount > 0) // 최초 땅에서 점프하는 순간
-		{
-			velocity.y = PLAYER_JUMP_VELOCITY;
-			_isJumping = true;
-		}
-
-		else if (1 <= _jumpCount && _jumpCount < PLAYER_MAX_JUMP_COUNT) // 이미 점프한 후 연속 점프 시도 상황
-		{
-			velocity.y = PLAYER_JUMP_VELOCITY;
-			_isJumping = true;
-		}
-	}
-
-	// KeyReleased: Space 키가 떼어졌을 때
-	if (!currentSpaceState && _previousSpaceState) {
-		if (_isJumping) // space 키다운으로 유효한 점프 상황에서 key released 되었을 때 (그냥 땅에서 떨어지며 공중에서 점프하는 것 방지)
-		{
-			++_jumpCount;
-			_isJumping = false;
-		}
-	}
-
-	_previousSpaceState = currentSpaceState;
-
-	// 현재 time에 따라 draw할 texture 얻기
-	_textureToDraw = _runAnimation.GetTexture();
 	
-	
-	if (velocity.x < -0.02f)
-		_facingLeft = true;
-	else if (velocity.x > 0.02f)
-		_facingLeft = false;
-	else
-		_textureToDraw = Resources::_textures["idle.png"]; // 캐릭터가 정지중일 때 적용할 animation texture
-
-	if (_groundContactCount <= 0)
-		_textureToDraw = Resources::_textures["jump.png"]; // 캐릭터가 점프중일 때 (지면에 없을 떄) 적용할 animation texture
-
-
+	HandleSkill(deltaTime, velocity); // 키보드 입력에 따라 skill 처리
+	HandleMove(deltaTime, velocity); // 키보드 입력에 따라 move 처리
+	HandleJump(velocity); // 키보드 입력에 따라 jump 처리
 	body->SetLinearVelocity(velocity);
 }
 
 void Player::Draw(Renderer& renderer)
 {
+	if (_playerStatus == PlayerStatus::Attacking) // 스킬 사용 중일 때는 스킬 렌더링
+	{
+		SkillManager::getInstance().Render(renderer, _currentSkillId);
+		return;
+	}
+
 	renderer.Draw(_textureToDraw, _position, Vector2f(_facingLeft ? -1.f : 1.f, PLAYER_NORMALIZED_HEIGHT), _angle); // 캐릭터가 왼쪽 바라보면 size.x에 음수 적용
 }
 
@@ -242,4 +192,99 @@ void Player::OnEndContact(b2Fixture* self, b2Fixture* other)
 		_groundContactCount = _groundContactCount > 0 ? --_groundContactCount : _groundContactCount;
 		return;
 	}
+}
+
+void Player::HandleMove(float deltaTime, b2Vec2& velocity)
+{
+	if (_playerStatus == PlayerStatus::Attacking) // skill 사용 중이면 return
+		return;
+
+	float move = PLAYER_MOVE_VELOCITY;
+
+	if (Keyboard::isKeyPressed(Keyboard::LShift)) // shift 키다운 시 이동속도 2배
+		move *= 2;
+
+	
+	velocity.x = 0.f;
+
+	if (Keyboard::isKeyPressed(Keyboard::Right))
+		velocity.x = +move;
+	if (Keyboard::isKeyPressed(Keyboard::Left))
+		velocity.x = -move;
+
+	// 현재 time에 따라 draw할 texture 얻기
+	_runAnimation.Update(deltaTime);
+	_textureToDraw = _runAnimation.GetTexture();
+
+	if (velocity.x < -0.02f)
+		_facingLeft = true;
+	else if (velocity.x > 0.02f)
+		_facingLeft = false;
+	else
+		_textureToDraw = Resources::_textures["idle.png"]; // 캐릭터가 정지중일 때 적용할 animation texture
+}
+
+void Player::HandleJump(b2Vec2& velocity)
+{
+	if (_playerStatus == PlayerStatus::Attacking) // skill 사용 중이면 return
+		return;
+
+	// PLAYER_MAX_JUMP_COUNT 횟수만큼 점프 가능하도록 구현 (최초 점프는 땅에서만 가능)
+	bool currentSpaceState = Keyboard::isKeyPressed(Keyboard::Space); // 프레임 별로 keyDown, keyReleased 판별을 위한 상태변수
+
+	// KeyDown: Space 키가 눌렸고, 이전 프레임에서는 떼어져 있었다면
+	if (currentSpaceState && !_previousSpaceState)
+	{
+		if (_groundContactCount > 0) // 최초 땅에서 점프하는 순간
+		{
+			velocity.y = PLAYER_JUMP_VELOCITY;
+			_isJumping = true;
+		}
+
+		else if (1 <= _jumpCount && _jumpCount < PLAYER_MAX_JUMP_COUNT) // 이미 점프한 후 연속 점프 시도 상황
+		{
+			velocity.y = PLAYER_JUMP_VELOCITY;
+			_isJumping = true;
+		}
+	}
+
+	// KeyReleased: Space 키가 떼어졌을 때
+	if (!currentSpaceState && _previousSpaceState) {
+		if (_isJumping) // space 키다운으로 유효한 점프 상황에서 key released 되었을 때 (그냥 땅에서 떨어지며 공중에서 점프하는 것 방지)
+		{
+			++_jumpCount;
+			_isJumping = false;
+		}
+	}
+
+	_previousSpaceState = currentSpaceState;
+
+	if (_groundContactCount <= 0)
+		_textureToDraw = Resources::_textures["jump.png"]; // 캐릭터가 점프중일 때 (지면에 없을 떄) 적용할 animation texture
+}
+
+void Player::HandleSkill(float deltaTime, b2Vec2& velocity)
+{
+	if (_playerStatus == PlayerStatus::Attacking) // 이미 skill 사용 중일 떄
+	{
+		// 스킬 애니메이션 업데이트
+		// 스킬 사용 시간이 끝난 경우 playerStatus를 Idle로 변경
+		SkillManager::getInstance().Update(deltaTime, _currentSkillId);
+		
+		if (SkillManager::getInstance().isSkillEnd(_currentSkillId))
+			_playerStatus = PlayerStatus::Idle;
+
+		return;
+	}
+
+	if (Keyboard::isKeyPressed(Keyboard::Q)) // 근접공격
+	{
+		velocity = b2Vec2(0.f, 0.f); // 스킬 사용 전 캐릭터 속도를 0으로 만듦
+		_playerStatus = PlayerStatus::Attacking;
+		_currentSkillId = (int)SkillList::MELEE_ATTACK;
+
+		// 스킬 사용
+		SkillManager::getInstance().Begin(_currentSkillId);
+	}
+		
 }

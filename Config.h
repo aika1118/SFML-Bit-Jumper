@@ -35,3 +35,8 @@
 // UI 관련 설정
 #define UI_VIEW_SIZE 100.f
 #define UI_CHARACTER_SCALE 0.1f
+
+// 스킬 관련 설정
+#define SKILL_MELEE_ATTACK_COOLDOWN 0.f
+#define SKILL_MELEE_ATTACK_DAMAGE 1.f
+#define SKILL_MELEE_ATTACK_SKILLTIME 0.5f
