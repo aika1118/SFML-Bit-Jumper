@@ -128,17 +128,30 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
-	// player가 적과 충돌한 경우
+	// player 공격이 적과 충돌한 경우
 	if (otherData->type == FixtureDataType::Object && otherData->object->_tag == "enemy")
 	{
 		Enemy* enemy = dynamic_cast<Enemy*>(otherData->object);
+		b2Body* attackBody = self->GetBody();
+
 		if (!enemy)
 			return;
 
-		// player 발 밑 센서로 적과 충돌한 경우 물리적 몸체만 먼저 destroy
+		// player 공격 fixture (attack box) 가 적과 충돌한 경우 적 피격 처리
 		// texture는 일정시간 동안 죽은 모습으로 계속 그림 (이후 objects에서 delete 처리 될 예정)
-		if (selfData->type == FixtureDataType::PlayerSensor)
-			enemy->destroyBody();
+
+		// selfData가 스킬이며 아직 적을 타격하지 않은 경우
+		if (selfData->type == FixtureDataType::Attack && !selfData->isSkillAttacked)
+		{
+			--enemy->_hp;
+			selfData->isSkillAttacked = true; // 스킬로 적을 타격한 경우 스킬 타격 처리
+
+			enemy->_isEnemyAttacked = true;
+
+			if (enemy->_hp <= 0)
+				enemy->destroyBody(); // Physics::bodiesToDestroy.push_back()랑 같은 역할
+		}
+			
 
 		// enemy가 살아있고 player가 적과 일반적으로 충돌한 경우 피격처리
 		else if (enemy->IsDead() == false)
@@ -276,6 +289,10 @@ void Player::HandleSkill(float deltaTime, b2Vec2& velocity)
 
 		return;
 	}
+
+	//
+	// _currentSkillId 스킬 쿨타임 중 스킬 사용 불가 코드추가 필요
+	// 
 
 	if (Keyboard::isKeyPressed(Keyboard::Q)) // 근접공격
 	{

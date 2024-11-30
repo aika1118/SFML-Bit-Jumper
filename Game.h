@@ -43,6 +43,7 @@ public:
 	Vector2f getPlayerPosition(); // player의 현재 position 반환
 	float getPlayerAngle(); // player의 현재 angle 반환
 	bool getPlayerFacingLeft(); // player의 바라보는 방향 반환
+	Player& getPlayer(); 
 
 
 private:

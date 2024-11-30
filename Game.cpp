@@ -49,7 +49,7 @@ void Game::Begin(const RenderWindow& window)
 
 void Game::InitSkill()
 {
-	// 근접공격 skill 초기화
+	// melee skill 초기화
 	int meleeStart = (int)SkillList::MELEE_START;
 	int meleeEnd = (int)SkillList::MELEE_END;
 
@@ -73,6 +73,11 @@ float Game::getPlayerAngle()
 bool Game::getPlayerFacingLeft()
 {
 	return player._facingLeft;
+}
+
+Player& Game::getPlayer()
+{
+	return player;
 }
 
 void Game::Restart()

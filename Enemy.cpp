@@ -34,6 +34,10 @@ void Enemy::Begin()
 	fixtureDef.density = 1.f;
 	fixtureDef.friction = 0.f;
 	_body->CreateFixture(&fixtureDef);
+
+	_hp = 2;
+	_hitTimer = 0.f;
+	_isEnemyAttacked = false;
 }
 
 void Enemy::Update(float deltaTime)
@@ -47,19 +51,34 @@ void Enemy::Update(float deltaTime)
 		return;
 	}
 
-	_animation.Update(deltaTime);
-
 	b2Vec2 velocity = _body->GetLinearVelocity();
 
-	if (abs(velocity.x) <= 0.02f) // 벽등에 부딪혀 속도가 0에 가까워지면 속도 방향을 바꿈
-		_movement *= -1.f;
+	if (_isEnemyAttacked) // 스킬에 피격당한 경우 일정 시간 멈춤
+	{
+		_hitTimer += deltaTime;
 
-	velocity.x = _movement;
+		if (_hitTimer >= ENEMY_STOP_TIME_AFTER_ATTACKED) // 멈추는 시간 지난 경우 관련 변수 초기화
+		{
+			_isEnemyAttacked = false;
+			_hitTimer = 0.f;
+		}
+		else
+			velocity.x = 0.f;
+	}
+	else // 스킬에 피격당하지 않은 경우
+	{
+		_animation.Update(deltaTime);
+		if (abs(velocity.x) <= 0.02f) // 벽등에 부딪혀 속도가 0에 가까워지면 속도 방향을 바꿈
+			_movement *= -1.f;
 
-	if (velocity.x < -0.02f)
-		_facingLeft = true;
-	else if (velocity.x > 0.02f)
-		_facingLeft = false;
+		velocity.x = _movement;
+
+		if (velocity.x < -0.02f)
+			_facingLeft = true;
+		else if (velocity.x > 0.02f)
+			_facingLeft = false;
+	}
+	
 
 	_body->SetLinearVelocity(velocity);
 	_position = Vector2f(_body->GetPosition().x, _body->GetPosition().y); // 물리적 위치 몸체와 위치 동기화

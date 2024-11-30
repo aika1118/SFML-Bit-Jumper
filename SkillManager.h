@@ -14,7 +14,7 @@ public:
 
 	void AddSkill(int skillId, Skill* skill); // 스킬 추가
 	void Begin(int skillId);
-	void Update(float deltaTime, int skillId); // 
+	void Update(float deltaTime, int skillId); 
 	void Render(Renderer& renderer, int skillId);
 	bool isSkillEnd(int skillId); // 스킬 사용이 끝났는지 체크
 	bool isValidSkill(int skillId); // 스킬 유효성 검사

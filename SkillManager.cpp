@@ -13,11 +13,12 @@ SkillManager& SkillManager::getInstance()
 
 void SkillManager::AddSkill(int skillId, Skill* skill)
 {
-	_skills[skillId] = skill;
+	_skills[skillId] = skill; // unordered_map에 스킬 추가
 }
 
 void SkillManager::Begin(int skillId)
 {
+	// skillId를 가진 스킬이 unordered_map에 있을지 탐색
 	auto it = _skills.find(skillId);
 	if (it == _skills.end())
 	{

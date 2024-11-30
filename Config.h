@@ -28,6 +28,7 @@
 #define ENEMY_MOVE_VELOCITY 5.f
 #define ENEMY_RADIUS 0.5f
 #define ENEMY_DESTROY_TIME 2.f
+#define ENEMY_STOP_TIME_AFTER_ATTACKED 1.f
 
 // 오브젝트 관련 설정
 #define OBJECT_COIN_SIZE 0.8f

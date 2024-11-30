@@ -15,13 +15,15 @@ enum class FixtureDataType
 	PlayerSensor,
 	MapTile,
 	SaveTile,
-	Object
+	Object,
+	Attack
 };
 
 struct FixtureData
 {
 	ContactListener* listener;
 	FixtureDataType type;
+	bool isSkillAttacked;
 
 	union // 한 공간을 공유하는 데이터 타입
 	{
