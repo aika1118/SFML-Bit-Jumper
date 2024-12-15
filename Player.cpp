@@ -102,11 +102,15 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 	// player가 mapTile과 닿아있는 경우
 	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile) 
 	{
+		if (_isJumping) // 점프 상태에서는 타일과 닿아있을 수 없으니 바로 return 처리
+			return;
+
 		++_groundContactCount; 
 
 		// jump 상태 초기화
 		_jumpCount = 0; 
-		_isJumping = false;
+
+		//cout << "Player is on MapTile. Init Progressed !" << endl;
 
 		return;
 	}
@@ -248,16 +252,22 @@ void Player::HandleJump(b2Vec2& velocity)
 	// KeyDown: Space 키가 눌렸고, 이전 프레임에서는 떼어져 있었다면
 	if (currentSpaceState && !_previousSpaceState)
 	{
+		//cout << "Space Pressed !" << endl;
+
 		if (_groundContactCount > 0) // 최초 땅에서 점프하는 순간
 		{
 			velocity.y = PLAYER_JUMP_VELOCITY;
 			_isJumping = true;
+
+			//cout << "Jump Success (Init) !" << endl;
 		}
 
 		else if (1 <= _jumpCount && _jumpCount < PLAYER_MAX_JUMP_COUNT) // 이미 점프한 후 연속 점프 시도 상황
 		{
 			velocity.y = PLAYER_JUMP_VELOCITY;
 			_isJumping = true;
+
+			//cout << "Jump Success (Continuous) !" << endl;
 		}
 	}
 
@@ -267,6 +277,7 @@ void Player::HandleJump(b2Vec2& velocity)
 		{
 			++_jumpCount;
 			_isJumping = false;
+			//cout << "Jump Released !" << endl;
 		}
 	}
 

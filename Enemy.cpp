@@ -87,6 +87,8 @@ void Enemy::Update(float deltaTime)
 
 void Enemy::Render(Renderer& renderer)
 {
+	// _isEnemyAttacked = true 일 때 적 피격 animation 별도 구축 필요
+
 	// _facingLeft : 캐릭터 속도 방향에 따라 x축 렌더링 방향 결정
 	// _position : 캐릭터 죽었을 때 y축 위치 재조정
 	renderer.Draw(_animation.GetTexture(), 
