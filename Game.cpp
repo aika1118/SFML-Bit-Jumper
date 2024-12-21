@@ -27,7 +27,7 @@ void Game::Begin(const RenderWindow& window)
 			Resources::_sounds[file.path().filename().string()].loadFromFile(file.path().string()); // unordered_map에 texture 정보 저장
 	}
 
-	_mapImage.loadFromFile("./resources/images/map2.png");
+	_mapImage.loadFromFile(MAP_STAGE_1);
 	_mapBound = FloatRect(0.f, 0.f, (float)_mapImage.getSize().x, (float)_mapImage.getSize().y); // 현재 mapBound 계산 (view가 맵 경계 벗어나지 않도록 하는 작업)
 
 	if (!font.loadFromFile("./resources/Fonts/ttf/BMDOHYEON_ttf.ttf"))
@@ -122,7 +122,8 @@ void Game::Render(Renderer& renderer)
 	for (Object* object : _objects)
 		object->Render(renderer);
 
-	Physics::DebugDraw(renderer);
+	if (MAP_IS_DEBUG_DRAW)
+		Physics::DebugDraw(renderer);
 }
 
 void Game::RenderUI(Renderer& renderer)

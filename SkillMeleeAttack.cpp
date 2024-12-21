@@ -45,5 +45,5 @@ void SkillMeleeAttack::Update(float deltaTime)
 
 void SkillMeleeAttack::Render(Renderer& renderer)
 {
-	renderer.Draw(_animation.GetTexture(), Game::getInstance().getPlayerPosition(), Vector2f(Game::getInstance().getPlayerFacingLeft() ? -1.f : 1.f, PLAYER_NORMALIZED_HEIGHT), Game::getInstance().getPlayerAngle());
+	renderer.Draw(_animation.GetTexture(), Game::getInstance().getPlayerPosition(), Vector2f(Game::getInstance().getPlayerFacingLeft() ? -PLAYER_SIZE_WIDTH : PLAYER_SIZE_WIDTH, PLAYER_SIZE_HEIGHT), Game::getInstance().getPlayerAngle());
 }

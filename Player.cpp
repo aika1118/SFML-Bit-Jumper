@@ -38,7 +38,7 @@ void Player::Begin()
 
 	// 캐릭터를 감싸는 충돌체
 	b2PolygonShape polygonShape;
-	polygonShape.SetAsBox(0.5f, PLAYER_NORMALIZED_HEIGHT / 2.f);
+	polygonShape.SetAsBox(PLAYER_SIZE_WIDTH / 2.f, PLAYER_SIZE_HEIGHT / 2.f);
 	fixtureDef.shape = &polygonShape;
 	body->CreateFixture(&fixtureDef);
 
@@ -52,7 +52,7 @@ void Player::Begin()
 	_sensorFixtureData.type = FixtureDataType::PlayerSensor;
 
 	sensorFixtureDef.userData.pointer = (uintptr_t)&_sensorFixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
-	sensorPolygonShape.SetAsBox(PLAYER_SENSOR_HX, PLAYER_SENSOR_HY, b2Vec2(0.f, PLAYER_NORMALIZED_HEIGHT / 2.f), 0.f);
+	sensorPolygonShape.SetAsBox(PLAYER_SENSOR_HX, PLAYER_SENSOR_HY, b2Vec2(0.f, PLAYER_SIZE_HEIGHT / 2.f), 0.f);
 	sensorFixtureDef.isSensor = true; // sensor : 충돌을 감지하지만 물리적인 상호작용은 하지 않는 특수한 fixture
 	sensorFixtureDef.shape = &sensorPolygonShape;
 
@@ -84,7 +84,7 @@ void Player::Draw(Renderer& renderer)
 		return;
 	}
 
-	renderer.Draw(_textureToDraw, _position, Vector2f(_facingLeft ? -1.f : 1.f, PLAYER_NORMALIZED_HEIGHT), _angle); // 캐릭터가 왼쪽 바라보면 size.x에 음수 적용
+	renderer.Draw(_textureToDraw, _position, Vector2f(_facingLeft ? -PLAYER_SIZE_WIDTH : PLAYER_SIZE_WIDTH, PLAYER_SIZE_HEIGHT), _angle); // 캐릭터가 왼쪽 바라보면 size.x에 음수 적용
 }
 
 Player::~Player()
@@ -102,15 +102,13 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 	// player가 mapTile과 닿아있는 경우
 	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile) 
 	{
-		if (_isJumping) // 점프 상태에서는 타일과 닿아있을 수 없으니 바로 return 처리
-			return;
-
 		++_groundContactCount; 
 
 		// jump 상태 초기화
 		_jumpCount = 0; 
+		_previousSpaceState = false; // 점프키 키다운으로 땅에서 연속 점프가 가능하게됨
 
-		//cout << "Player is on MapTile. Init Progressed !" << endl;
+		cout << "Player is on MapTile. Init Progressed !" << endl;
 
 		return;
 	}
@@ -252,14 +250,15 @@ void Player::HandleJump(b2Vec2& velocity)
 	// KeyDown: Space 키가 눌렸고, 이전 프레임에서는 떼어져 있었다면
 	if (currentSpaceState && !_previousSpaceState)
 	{
-		//cout << "Space Pressed !" << endl;
+		cout << "Space Pressed !" << endl;
+		cout << "_groundContactCount : " << _groundContactCount << endl;
 
 		if (_groundContactCount > 0) // 최초 땅에서 점프하는 순간
 		{
 			velocity.y = PLAYER_JUMP_VELOCITY;
 			_isJumping = true;
 
-			//cout << "Jump Success (Init) !" << endl;
+			cout << "Jump Success (Init) !" << endl;
 		}
 
 		else if (1 <= _jumpCount && _jumpCount < PLAYER_MAX_JUMP_COUNT) // 이미 점프한 후 연속 점프 시도 상황
@@ -267,7 +266,7 @@ void Player::HandleJump(b2Vec2& velocity)
 			velocity.y = PLAYER_JUMP_VELOCITY;
 			_isJumping = true;
 
-			//cout << "Jump Success (Continuous) !" << endl;
+			cout << "Jump Success (Continuous) !" << endl;
 		}
 	}
 
@@ -277,7 +276,7 @@ void Player::HandleJump(b2Vec2& velocity)
 		{
 			++_jumpCount;
 			_isJumping = false;
-			//cout << "Jump Released !" << endl;
+			cout << "Jump Released !" << endl;
 		}
 	}
 
