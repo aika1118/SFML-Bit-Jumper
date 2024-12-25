@@ -20,6 +20,10 @@
 #define PLAYER_MAX_JUMP_COUNT 1
 #define PLAYER_INVINCIBILITY_TIME 1.f 
 
+// 판정 관련
+#define JUDGEMENT_PERFECT 41.67f
+#define JUDGEMENT_GREAT 60.f
+
 
 // 월드 관련 설정
 #define WORLD_GRAVITY_X 0.f

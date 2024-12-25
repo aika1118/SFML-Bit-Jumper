@@ -11,7 +11,7 @@ int main()
 	Game &game = Game::getInstance();
 	Renderer renderer(window); // 렌더링될 타겟을 window로 지정
 
-	//window.setFramerateLimit(60);
+	// window.setFramerateLimit(30);
 
 	game.Begin(window);
 	

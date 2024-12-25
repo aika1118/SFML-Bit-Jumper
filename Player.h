@@ -64,6 +64,11 @@ private:
 	FixtureData _fixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
 	FixtureData _sensorFixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
 
+	bool _isFirstGrounded = false; // 땅에 한번 닿을 때마다 값을 기억하기 위한 boolean
+	float _timeWhenJumpKeydown = 0.f; // 점프 시점 기록
+	float _timeWhenGrounded = 0.f; // 땅에 닿은 시점 기록
+	float _timeInOneCycle = 0.f; // 한 점프 사이클마다 점프시점, 땅에 닿은 시점을 기록하기 위한 time 값
+
 	PlayerStatus _playerStatus;
 	int _currentSkillId;
 };

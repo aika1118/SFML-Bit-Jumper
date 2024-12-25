@@ -69,6 +69,10 @@ void Player::Update(float deltaTime)
 	_position = Vector2f(body->GetPosition().x, body->GetPosition().y); // Physics::Update()에서 world.Step에 의해 프레임 당 물리 계산 적용중, 이로 인해 body position 변화 발생
 	_angle = body->GetAngle() * (180.f / M_PI); // 라디안에서 도(degree) 변환
 	b2Vec2 velocity = body->GetLinearVelocity();
+
+	_timeInOneCycle += deltaTime; // 한 점프 cycle마다 흐르는 time
+	if (fabs(_timeInOneCycle - _timeWhenGrounded) * 1000.f >= 2000.f) // 땅에 머무는 시간이 2초가 지난 경우 timeOver 처리
+		cout << "timeOver !" << endl;
 	
 	HandleSkill(deltaTime, velocity); // 키보드 입력에 따라 skill 처리
 	HandleMove(deltaTime, velocity); // 키보드 입력에 따라 move 처리
@@ -108,7 +112,14 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		_jumpCount = 0; 
 		_previousSpaceState = false; // 점프키 키다운으로 땅에서 연속 점프가 가능하게됨
 
-		cout << "Player is on MapTile. Init Progressed !" << endl;
+		if (!_isFirstGrounded) // 점프 후 땅이 최초로 닿았을 때
+		{
+			_isFirstGrounded = true;
+			//cout << "First Grounded !" << endl;
+			_timeWhenGrounded = _timeInOneCycle; // 땅이 닿은 시점을 기록 (for 판정)
+		}
+
+		//cout << "Player is on MapTile. Init Progressed !" << endl;
 
 		return;
 	}
@@ -125,7 +136,7 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 
 		++_coins;
 
-		cout << "coins = " << _coins << endl;
+		//cout << "coins = " << _coins << endl;
 
 		return;
 	}
@@ -246,27 +257,41 @@ void Player::HandleJump(b2Vec2& velocity)
 
 	// PLAYER_MAX_JUMP_COUNT 횟수만큼 점프 가능하도록 구현 (최초 점프는 땅에서만 가능)
 	bool currentSpaceState = Keyboard::isKeyPressed(Keyboard::Space); // 프레임 별로 keyDown, keyReleased 판별을 위한 상태변수
+	
+	// 점프키를 눌렀으며 _timeWhenJumpKeydown 값이 초기화 상태일 때 점프키 누른 시점을 기록 (for 판정)
+	if (_timeWhenJumpKeydown == 0.f && currentSpaceState) 
+		_timeWhenJumpKeydown = _timeInOneCycle;
 
 	// KeyDown: Space 키가 눌렸고, 이전 프레임에서는 떼어져 있었다면
 	if (currentSpaceState && !_previousSpaceState)
 	{
-		cout << "Space Pressed !" << endl;
-		cout << "_groundContactCount : " << _groundContactCount << endl;
+		//cout << "Space Pressed !" << endl;
+		//cout << "_groundContactCount : " << _groundContactCount << endl;
 
 		if (_groundContactCount > 0) // 최초 땅에서 점프하는 순간
 		{
 			velocity.y = PLAYER_JUMP_VELOCITY;
 			_isJumping = true;
+			_isFirstGrounded = false;
+			//cout << "Jump Success (Init) !" << endl;
 
-			cout << "Jump Success (Init) !" << endl;
+			// 현재 점프를 위해 점프키를 누른 시간 (_timeWhenJumpKeydown)에서 점프를 위해 땅에 닿은 시간 (_timeWhenGrounded) 차이로 판정 계산
+			float judgementTime = fabs(_timeWhenJumpKeydown - _timeWhenGrounded) * 1000.f;
+			cout << judgementTime << "ms" << endl;
+			if (judgementTime <= JUDGEMENT_PERFECT)
+				cout << "Perfect!" << endl;
+			else if (judgementTime <= JUDGEMENT_GREAT)
+				cout << "Great!" << endl;
+			else
+				cout << "Miss!" << endl;
 		}
 
 		else if (1 <= _jumpCount && _jumpCount < PLAYER_MAX_JUMP_COUNT) // 이미 점프한 후 연속 점프 시도 상황
 		{
 			velocity.y = PLAYER_JUMP_VELOCITY;
 			_isJumping = true;
-
-			cout << "Jump Success (Continuous) !" << endl;
+			_isFirstGrounded = false;
+			//cout << "Jump Success (Continuous) !" << endl;
 		}
 	}
 
@@ -276,7 +301,12 @@ void Player::HandleJump(b2Vec2& velocity)
 		{
 			++_jumpCount;
 			_isJumping = false;
-			cout << "Jump Released !" << endl;
+			//cout << "Jump Released !" << endl;
+
+			// 점프 처리 후 key가 released 되었을 때 판정을 관리하는 시간변수들 초기화
+			_timeInOneCycle = 0.f;
+			_timeWhenJumpKeydown = 0.f;
+			_timeWhenGrounded = 0.f;
 		}
 	}
 
