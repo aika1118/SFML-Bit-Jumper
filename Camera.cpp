@@ -1,10 +1,6 @@
 #include "Camera.h"
 #include "Game.h" // 순환참조 회피
 
-Camera::Camera()
-	:_zoomLevel(CAMERA_ZOOM_LEVEL)
-{
-}
 
 Camera& Camera::getInstance()
 {

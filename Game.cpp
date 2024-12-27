@@ -1,7 +1,7 @@
 #include "Game.h"
 
 
-Game::Game() // 싱글톤 객체 (정적 인스턴스) 생성 시 기본 생성자 필요
+Game::Game() // 참조자 멤버변수 초기화
 	:gameMap(Map::getInstance()), camera(Camera::getInstance())
 {
 }
