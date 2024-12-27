@@ -15,6 +15,7 @@ public:
 	virtual void Update(float deltaTime) = 0;
 	virtual void Render(Renderer& renderer) = 0;
 	virtual void destroyBody(); // 현재 object의 body를 world에서 제거
+	virtual ~Object() = default;
 
 	string _tag; // object 구분을 위한 tag
 	float _angle;

@@ -138,6 +138,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Coin.cpp" />
+    <ClCompile Include="ContactListener.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="FixtureData.cpp" />
     <ClCompile Include="Game.cpp" />
