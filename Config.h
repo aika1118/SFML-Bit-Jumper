@@ -7,7 +7,7 @@ const float M_PI = 22.f / 7.f;
 
 // 맵 관련 설정
 const float MAP_CELL_SIZE = 1.f;
-const string MAP_STAGE_1 = "./resources/images/stage1.png";
+const string MAP_STAGE_1 = "./resources/images/map2.png";
 const bool MAP_IS_DEBUG_DRAW = false;
 
 // 카메라 관련 설정
@@ -15,7 +15,7 @@ const float CAMERA_ZOOM_LEVEL = 20.f;
 
 // 플레이어 관련 설정
 const float PLAYER_SIZE_RATIO = 1.28f;
-const float PLAYER_SIZE_WIDTH = 0.5f;
+const float PLAYER_SIZE_WIDTH = 1.f;
 const float PLAYER_SIZE_HEIGHT = (PLAYER_SIZE_WIDTH * PLAYER_SIZE_RATIO);
 const float PLAYER_SENSOR_HX = (PLAYER_SIZE_WIDTH / 2.f) * 0.8f;
 const float PLAYER_SENSOR_HY = 0.01f;
@@ -39,13 +39,13 @@ const int WORLD_VELOCITY_ITERATION = 8;
 const int WORLD_POSITION_ITERATION = 3;
 
 // 플레이어 점프 관련 설정
-const float PLAYER_JUMP_HEIGHT = 2.f;
+const float PLAYER_JUMP_HEIGHT = 3.f;
 const float PLAYER_JUMP_TIME = 0.5f;
 // 고정값
 const float WORLD_GRAVITY_Y = (8.0f * PLAYER_JUMP_HEIGHT) / (PLAYER_JUMP_TIME * PLAYER_JUMP_TIME);
 // 고정값
 const float PLAYER_JUMP_VELOCITY =  -1.f * (WORLD_GRAVITY_Y * PLAYER_JUMP_TIME) / 2.0f;
-const float PLAYER_MOVE_DISTANCE = 1.f;
+const float PLAYER_MOVE_DISTANCE = 2.5f;
 // 고정값
 const float PLAYER_MOVE_VELOCITY = (PLAYER_MOVE_DISTANCE / PLAYER_JUMP_TIME);
 

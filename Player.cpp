@@ -144,7 +144,7 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
-	// player 공격이 적과 충돌한 경우
+	// player가 적과 충돌한 경우
 	if (otherData->type == FixtureDataType::Object && otherData->object->_tag == "enemy")
 	{
 		Enemy* enemy = dynamic_cast<Enemy*>(otherData->object);
@@ -167,6 +167,10 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 			if (enemy->_hp <= 0)
 				enemy->destroyBody(); // Physics::bodiesToDestroy.push_back()랑 같은 역할
 		}
+
+		// Player가 발 밑 센서로 적과 충돌한 경우 적 처치 처리 (적을 밟으면 죽일 수 있음)
+		if (selfData->type == FixtureDataType::PlayerSensor) 
+			enemy->destroyBody();
 			
 
 		// enemy가 살아있고 player가 적과 일반적으로 충돌한 경우 피격처리
