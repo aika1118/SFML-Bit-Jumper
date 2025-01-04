@@ -45,6 +45,9 @@ public:
 
 	bool _facingLeft = false; // 캐릭터가 왼쪽을 바라보고 있는지 체크 (x축 속도의 부호로 판별)
 
+	float getJudgementPercentage();
+	string getJudgementCurrent();
+
 private:
 	void HandleMove(float deltaTime, b2Vec2& velocity);
 	void HandleJump(b2Vec2& velocity);
@@ -68,6 +71,13 @@ private:
 	float _timeWhenJumpKeydown = 0.f; // 점프 시점 기록
 	float _timeWhenGrounded = 0.f; // 땅에 닿은 시점 기록
 	float _timeInOneCycle = 0.f; // 한 점프 사이클마다 점프시점, 땅에 닿은 시점을 기록하기 위한 time 값
+	
+	float _judgementPerfectCnt = 0;
+	float _judgementGreatCnt = 0;
+	float _judgementMissCnt = 0;
+	float _judgementTotalCnt = 0; // 총 점프 횟수
+	float _judgementPercentage = 0; // 총 점프 횟수와 판정 개수를 적절히 혼합하여 산출된 판정비율
+	string _judgementCurrent = "-"; // 플레이어의 현재 판정
 
 	PlayerStatus _playerStatus;
 	int _currentSkillId;

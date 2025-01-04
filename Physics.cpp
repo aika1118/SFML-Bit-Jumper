@@ -21,9 +21,9 @@ void Physics::Update(float deltaTime)
 	world->Step(deltaTime, WORLD_VELOCITY_ITERATION, WORLD_POSITION_ITERATION); // deltaTime 경과에 따른 속도와 위치 업데이트 (속도 및 위치 계산을 위한 연산 횟수)
 	
 	// Step 이후 삭제 대기 리스트 처리 (step중 destroy 할 수 없기 때문에 이렇게 처리)
-	for (b2Body* body : bodiesToDestroy)
+	for (b2Body* body : bodiesToDestroy) 
 	{
-		// body->GetUserData().pointer 에 동적할당된 객체도 delete 해줘야 하지 않을까?
+		// body->GetUserData().pointer 에 동적할당된 객체도 delete 해줘야 하지 않을까? (스마트 포인터 고려)
 		Physics::world->DestroyBody(body);
 	}
 

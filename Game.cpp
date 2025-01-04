@@ -36,11 +36,17 @@ void Game::Begin(const RenderWindow& window)
 		return;
 	}
 		
-	playerHpText.setFont(font);
-	playerHpText.setFillColor(Color::White);
-	playerHpText.setOutlineColor(Color::Black);
-	playerHpText.setOutlineThickness(1.f);
-	playerHpText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
+	playerJudgementPercentageText.setFont(font);
+	playerJudgementPercentageText.setFillColor(Color::White);
+	playerJudgementPercentageText.setOutlineColor(Color::Black);
+	playerJudgementPercentageText.setOutlineThickness(1.f);
+	playerJudgementPercentageText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
+
+	playerJudgementText.setFont(font);
+	playerJudgementText.setFillColor(Color::White);
+	playerJudgementText.setOutlineColor(Color::Black);
+	playerJudgementText.setOutlineThickness(1.f);
+	playerJudgementText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
 
 	InitSkill();
 
@@ -123,16 +129,20 @@ void Game::Render(Renderer& renderer)
 		object->Render(renderer);
 
 	if (MAP_IS_DEBUG_DRAW)
-		Physics::DebugDraw(renderer);
+		Physics::DebugDraw(renderer); 
 }
 
 void Game::RenderUI(Renderer& renderer)
 {
 	renderer._target.setView(camera.getUIView());
 
-	playerHpText.setPosition(-camera.getViewSize() / 2.f + Vector2f(2.f, 1.f)); // view 중심 (0, 0)으로부터 계산되는 position, 왼쪽 위로 설정됨
-	playerHpText.setString("HP: " + to_string(player._hp));
-	renderer._target.draw(playerHpText);
+	playerJudgementPercentageText.setPosition(-camera.getViewSize() / 2.f + Vector2f(2.f, 1.f)); // view 중심 (0, 0)으로부터 계산되는 position, 왼쪽 위로 설정됨
+	playerJudgementPercentageText.setString("Judgement: " + Util::floatToString(player.getJudgementPercentage(), 2) + "%");
+	renderer._target.draw(playerJudgementPercentageText);
+
+	playerJudgementText.setPosition(-camera.getViewSize() / 2.f + Vector2f(2.f, 5.f));
+	playerJudgementText.setString(player.getJudgementCurrent());
+	renderer._target.draw(playerJudgementText);
 }
 
 void Game::setMapBound(FloatRect mapBound)

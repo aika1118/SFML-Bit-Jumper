@@ -220,6 +220,16 @@ void Player::OnEndContact(b2Fixture* self, b2Fixture* other)
 	}
 }
 
+float Player::getJudgementPercentage()
+{
+	return _judgementPercentage;
+}
+
+string Player::getJudgementCurrent()
+{
+	return _judgementCurrent;
+}
+
 void Player::HandleMove(float deltaTime, b2Vec2& velocity)
 {
 	if (_playerStatus == PlayerStatus::Attacking) // skill 사용 중이면 return
@@ -277,13 +287,29 @@ void Player::HandleJump(b2Vec2& velocity)
 
 			// 현재 점프를 위해 점프키를 누른 시간 (_timeWhenJumpKeydown)에서 점프를 위해 땅에 닿은 시간 (_timeWhenGrounded) 차이로 판정 계산
 			float judgementTime = fabs(_timeWhenJumpKeydown - _timeWhenGrounded) * 1000.f;
-			cout << judgementTime << "ms" << endl;
-			if (judgementTime <= JUDGEMENT_PERFECT)
-				cout << "Perfect!" << endl;
+			//cout << judgementTime << "ms" << endl;
+			if (judgementTime <= JUDGEMENT_PERFECT || _judgementTotalCnt == 0) // 처음 점프했을 때는 무조건 Perfect 처리
+			{ 
+				_judgementPerfectCnt += 1;
+				_judgementCurrent = "Perfect";
+				cout << "Perfect" << endl;
+			}
 			else if (judgementTime <= JUDGEMENT_GREAT)
-				cout << "Great!" << endl;
+			{
+				_judgementGreatCnt += 1;
+				_judgementCurrent = "Great";
+				cout << "Great" << endl;
+			}
 			else
-				cout << "Miss!" << endl;
+			{
+				_judgementMissCnt += 1;
+				_judgementCurrent = "Miss";
+				cout << "Miss" << endl;
+			}
+
+			_judgementTotalCnt += 1;
+
+			_judgementPercentage = 100.f * (_judgementPerfectCnt * 1.f + _judgementGreatCnt * 0.5f + _judgementMissCnt * 0.f) / _judgementTotalCnt;
 		}
 
 		else if (1 <= _jumpCount && _jumpCount < PLAYER_MAX_JUMP_COUNT) // 이미 점프한 후 연속 점프 시도 상황

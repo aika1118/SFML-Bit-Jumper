@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "SkillManager.h"
 #include "SkillMeleeAttack.h"
+#include "Util.h"
 
 using namespace sf;
 using namespace std;
@@ -58,7 +59,8 @@ private:
 	Player player;
 
 	Font font;
-	Text playerHpText;
+	Text playerJudgementPercentageText;
+	Text playerJudgementText;
 
 	FloatRect _mapBound;
 };

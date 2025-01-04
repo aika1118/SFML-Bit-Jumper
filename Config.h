@@ -23,7 +23,13 @@ const int PLAYER_MAX_JUMP_COUNT = 1;
 const float PLAYER_INVINCIBILITY_TIME = 1.f;
 
 // 판정 관련
-const float JUDGEMENT_PERFECT = 41.67f;
+
+// DJMAX 판정 (쉬움)
+//const float JUDGEMENT_PERFECT = 41.67f;
+//const float JUDGEMENT_GREAT = 60.f;
+
+// EZ2ON 판정 (어려움)
+const float JUDGEMENT_PERFECT = 22.f;
 const float JUDGEMENT_GREAT = 60.f;
 
 

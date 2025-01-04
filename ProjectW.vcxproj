@@ -154,6 +154,7 @@
     <ClCompile Include="Resources.cpp" />
     <ClCompile Include="Skill.cpp" />
     <ClCompile Include="SkillManager.cpp" />
+    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Resources.h" />
     <ClInclude Include="Skill.h" />
     <ClInclude Include="SkillManager.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\images\map.png" />

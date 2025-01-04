@@ -11,9 +11,9 @@
 class Coin : public Object
 {
 public:
-	virtual void Begin() override;
-	virtual void Update(float deltaTime) override;
-	virtual void Render(Renderer& renderer) override;
+	void Begin() override;
+	void Update(float deltaTime) override;
+	void Render(Renderer& renderer) override;
 
 private:
 	Animation _animation;
