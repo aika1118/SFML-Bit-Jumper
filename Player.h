@@ -41,7 +41,7 @@ public:
 	float _angle;
 
 	int _hp;
-	bool _isDead;
+	bool _isDead = false;
 
 	bool _facingLeft = false; // 캐릭터가 왼쪽을 바라보고 있는지 체크 (x축 속도의 부호로 판별)
 

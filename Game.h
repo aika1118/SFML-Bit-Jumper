@@ -61,6 +61,9 @@ private:
 	Font font;
 	Text playerJudgementPercentageText;
 	Text playerJudgementText;
+	Text gameOverText;
+
+	RectangleShape backgroundWhenPaused; // 일시정지할 때의 배경
 
 	FloatRect _mapBound;
 };

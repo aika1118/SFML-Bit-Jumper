@@ -48,6 +48,16 @@ void Game::Begin(const RenderWindow& window)
 	playerJudgementText.setOutlineThickness(1.f);
 	playerJudgementText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
 
+	gameOverText.setFont(font);
+	gameOverText.setFillColor(Color::White);
+	gameOverText.setOutlineColor(Color::Black);
+	gameOverText.setOutlineThickness(1.f);
+	gameOverText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
+
+	backgroundWhenPaused.setSize(Vector2f(1.f, 1.f));
+	backgroundWhenPaused.setFillColor(Color(0, 0, 0, 150)); // 알파값만 조정
+	backgroundWhenPaused.setOrigin(0.5f, 0.5f); // origin을 중심으로 맞추기
+
 	InitSkill();
 
 	Restart();
@@ -103,8 +113,11 @@ void Game::Restart()
 
 void Game::Update(float deltaTime)
 {
-	if (player._isDead) // 플레이어 사망 시 재시작
-		Restart();
+	if (player._isDead && Keyboard::isKeyPressed(Keyboard::Enter)) // 플레이어 사망상태에서 Enter 눌러서 재시작
+		Restart(); 
+
+	if (player._isDead) // player 사망상태에서는 update 하지 않음
+		return;
 
 	Physics::Update(deltaTime);
 	player.Update(deltaTime);
@@ -143,6 +156,20 @@ void Game::RenderUI(Renderer& renderer)
 	playerJudgementText.setPosition(-camera.getViewSize() / 2.f + Vector2f(2.f, 5.f));
 	playerJudgementText.setString(player.getJudgementCurrent());
 	renderer._target.draw(playerJudgementText);
+
+	// 게임 일시정지 되었을 때 배경화면 지정
+	if (player._isDead)
+	{
+		backgroundWhenPaused.setScale(camera.getViewSize());
+		renderer._target.draw(backgroundWhenPaused); 
+
+		//gameOverText.setPosition(Vector2f(0.f, camera.getViewSize().y / 2.f) + Vector2f(0.f, -5.f));
+		gameOverText.setString("Game Over!\nPress Enter to Restart");
+		// Text origin을 중심으로 배치
+		FloatRect textBounds = gameOverText.getLocalBounds();
+		gameOverText.setOrigin(textBounds.left + textBounds.width / 2.0f, textBounds.top + textBounds.height / 2.0f);
+		renderer._target.draw(gameOverText);
+	}
 }
 
 void Game::setMapBound(FloatRect mapBound)

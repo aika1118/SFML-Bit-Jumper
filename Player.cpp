@@ -72,7 +72,10 @@ void Player::Update(float deltaTime)
 
 	_timeInOneCycle += deltaTime; // 한 점프 cycle마다 흐르는 time
 	if (fabs(_timeInOneCycle - _timeWhenGrounded) * 1000.f >= 2000.f) // 땅에 머무는 시간이 2초가 지난 경우 timeOver 처리
+	{
 		cout << "timeOver !" << endl;
+		_isDead = true;
+	}
 	
 	HandleSkill(deltaTime, velocity); // 키보드 입력에 따라 skill 처리
 	HandleMove(deltaTime, velocity); // 키보드 입력에 따라 move 처리
