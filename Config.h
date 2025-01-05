@@ -7,7 +7,7 @@ const float M_PI = 22.f / 7.f;
 
 // 맵 관련 설정
 const float MAP_CELL_SIZE = 1.f;
-const string MAP_STAGE_1 = "./resources/images/map2.png";
+const string MAP_STAGE_1 = "./resources/images/map.png";
 const bool MAP_IS_DEBUG_DRAW = false;
 
 // 카메라 관련 설정
@@ -39,8 +39,8 @@ const int WORLD_VELOCITY_ITERATION = 8;
 const int WORLD_POSITION_ITERATION = 3;
 
 // 플레이어 점프 관련 설정
-const float PLAYER_JUMP_HEIGHT = 3.f;
-const float PLAYER_JUMP_TIME = 0.5f;
+const float PLAYER_JUMP_HEIGHT = 4.f;
+const float PLAYER_JUMP_TIME = 0.75f;
 // 고정값
 const float WORLD_GRAVITY_Y = (8.0f * PLAYER_JUMP_HEIGHT) / (PLAYER_JUMP_TIME * PLAYER_JUMP_TIME);
 // 고정값
@@ -66,3 +66,6 @@ const float UI_CHARACTER_SCALE = 0.1f;
 const float SKILL_MELEE_ATTACK_COOLDOWN = 0.f;
 const float SKILL_MELEE_ATTACK_DAMAGE = 1.f;
 const float SKILL_MELEE_ATTACK_SKILLTIME = 0.5f;
+
+// 게임오버 관련 설정
+const float GAME_OVER_LIMIT_TIME = (60.f) * (1000.f); // ms 단위 (해당 시간 잠수타면 게임 종료 처리)

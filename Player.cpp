@@ -71,7 +71,7 @@ void Player::Update(float deltaTime)
 	b2Vec2 velocity = body->GetLinearVelocity();
 
 	_timeInOneCycle += deltaTime; // 한 점프 cycle마다 흐르는 time
-	if (fabs(_timeInOneCycle - _timeWhenGrounded) * 1000.f >= 2000.f) // 땅에 머무는 시간이 2초가 지난 경우 timeOver 처리
+	if (fabs(_timeInOneCycle - _timeWhenGrounded) * 1000.f >= GAME_OVER_LIMIT_TIME) // 땅에 머무는 시간이 2초가 지난 경우 timeOver 처리
 	{
 		cout << "timeOver !" << endl;
 		_isDead = true;
@@ -329,7 +329,7 @@ void Player::HandleJump(b2Vec2& velocity)
 	}
 
 	// KeyReleased: Space 키가 떼어졌을 때
-	if (!currentSpaceState && _previousSpaceState) {
+	else if (!currentSpaceState && _previousSpaceState) {
 		if (_isJumping) // space 키다운으로 유효한 점프 상황에서 key released 되었을 때 (그냥 땅에서 떨어지며 공중에서 점프하는 것 방지)
 		{
 			++_jumpCount;
@@ -342,6 +342,8 @@ void Player::HandleJump(b2Vec2& velocity)
 			_timeWhenGrounded = 0.f;
 		}
 	}
+
+	else return;
 
 	_previousSpaceState = currentSpaceState;
 
