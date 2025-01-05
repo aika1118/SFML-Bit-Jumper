@@ -17,8 +17,8 @@ const float CAMERA_ZOOM_LEVEL = 20.f;
 const float PLAYER_SIZE_RATIO = 1.28f;
 const float PLAYER_SIZE_WIDTH = 1.f;
 const float PLAYER_SIZE_HEIGHT = (PLAYER_SIZE_WIDTH * PLAYER_SIZE_RATIO);
-const float PLAYER_SENSOR_HX = (PLAYER_SIZE_WIDTH / 2.f) * 0.8f;
-const float PLAYER_SENSOR_HY = 0.01f;
+const float PLAYER_SENSOR_HX = (PLAYER_SIZE_WIDTH / 2.f) * 1.f;
+const float PLAYER_SENSOR_HY = 0.2f;
 const int PLAYER_MAX_JUMP_COUNT = 1;
 const float PLAYER_INVINCIBILITY_TIME = 1.f;
 
@@ -45,7 +45,8 @@ const float PLAYER_JUMP_TIME = 0.75f;
 const float WORLD_GRAVITY_Y = (8.0f * PLAYER_JUMP_HEIGHT) / (PLAYER_JUMP_TIME * PLAYER_JUMP_TIME);
 // 고정값
 const float PLAYER_JUMP_VELOCITY =  -1.f * (WORLD_GRAVITY_Y * PLAYER_JUMP_TIME) / 2.0f;
-const float PLAYER_MOVE_DISTANCE = 2.5f;
+// 플레이어 X축 속도
+const float PLAYER_MOVE_DISTANCE = 3.f;
 // 고정값
 const float PLAYER_MOVE_VELOCITY = (PLAYER_MOVE_DISTANCE / PLAYER_JUMP_TIME);
 
