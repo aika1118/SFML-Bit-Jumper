@@ -13,6 +13,7 @@
 #include "SkillManager.h"
 #include "SkillMeleeAttack.h"
 #include "Util.h"
+#include "MenuManager.h"
 
 using namespace sf;
 using namespace std;
@@ -23,8 +24,8 @@ class Game
 public:
 	static Game& getInstance(); // 싱글톤
 
-	void Begin(const RenderWindow& window); // 게임 시작 전 초기화 작업을 수행
-	void Update(float deltaTime); // 게임 업데이트 작업
+	void Begin(RenderWindow& window); // 게임 시작 전 초기화 작업을 수행
+	void Update(float deltaTime, RenderWindow& window); // 게임 업데이트 작업
 	void Render(Renderer& renderer); // 게임 렌더링 작업
 	void RenderUI(Renderer& renderer); // UI 렌더링 작업
 	void Restart(); // 게임 재시작
@@ -45,6 +46,7 @@ public:
 	float getPlayerAngle(); // player의 현재 angle 반환
 	bool getPlayerFacingLeft(); // player의 바라보는 방향 반환
 	Player& getPlayer(); 
+	int& getMenuState();
 
 
 private:
@@ -66,4 +68,6 @@ private:
 	RectangleShape backgroundWhenPaused; // 일시정지할 때의 배경
 
 	FloatRect _mapBound;
+
+	int _menuState = MenuIndex::MAIN_MENU;
 };

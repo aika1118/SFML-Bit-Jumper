@@ -8,7 +8,7 @@ const float M_PI = 22.f / 7.f;
 // 맵 관련 설정
 const float MAP_CELL_SIZE = 1.f;
 const string MAP_STAGE_1 = "./resources/images/map.png";
-const bool MAP_IS_DEBUG_DRAW = false;
+const bool MAP_IS_DEBUG_DRAW = true;
 
 // 카메라 관련 설정
 const float CAMERA_ZOOM_LEVEL = 20.f;
@@ -17,8 +17,8 @@ const float CAMERA_ZOOM_LEVEL = 20.f;
 const float PLAYER_SIZE_RATIO = 1.28f;
 const float PLAYER_SIZE_WIDTH = 1.f;
 const float PLAYER_SIZE_HEIGHT = (PLAYER_SIZE_WIDTH * PLAYER_SIZE_RATIO);
-const float PLAYER_SENSOR_HX = (PLAYER_SIZE_WIDTH / 2.f) * 1.f;
-const float PLAYER_SENSOR_HY = 0.2f;
+const float PLAYER_SENSOR_HX = (PLAYER_SIZE_WIDTH / 2.f) * 0.8f;
+const float PLAYER_SENSOR_HY = 0.1f;
 const int PLAYER_MAX_JUMP_COUNT = 1;
 const float PLAYER_INVINCIBILITY_TIME = 1.f;
 
@@ -46,7 +46,7 @@ const float WORLD_GRAVITY_Y = (8.0f * PLAYER_JUMP_HEIGHT) / (PLAYER_JUMP_TIME * 
 // 고정값
 const float PLAYER_JUMP_VELOCITY =  -1.f * (WORLD_GRAVITY_Y * PLAYER_JUMP_TIME) / 2.0f;
 // 플레이어 X축 속도
-const float PLAYER_MOVE_DISTANCE = 3.f;
+const float PLAYER_MOVE_DISTANCE = 3.5f;
 // 고정값
 const float PLAYER_MOVE_VELOCITY = (PLAYER_MOVE_DISTANCE / PLAYER_JUMP_TIME);
 
@@ -70,3 +70,21 @@ const float SKILL_MELEE_ATTACK_SKILLTIME = 0.5f;
 
 // 게임오버 관련 설정
 const float GAME_OVER_LIMIT_TIME = (60.f) * (1000.f); // ms 단위 (해당 시간 잠수타면 게임 종료 처리)
+
+// 메뉴 관련 설정
+const int MENU_MAX_STAGE_NUM = 3;
+const int MENU_MAX_TYPE_NUM = 2;
+enum MenuIndex
+{
+    EXIT = -1,
+    MAIN_MENU,
+    STAGE_MENU,
+    END_OF_MENU_INDEX
+};
+enum StageIndex
+{
+    START_OF_STAGE_INDEX = MenuIndex::END_OF_MENU_INDEX,
+    STAGE_1,
+    STAGE_2,
+    STAGE_3
+};

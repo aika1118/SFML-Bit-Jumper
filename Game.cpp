@@ -13,7 +13,7 @@ Game& Game::getInstance()
 }
 
 
-void Game::Begin(const RenderWindow& window)
+void Game::Begin(RenderWindow& window)
 {
 	for (const auto& file : filesystem::directory_iterator("./resources/textures/")) // 해당 경로에 있는 모든 texture 불러오기
 	{
@@ -35,6 +35,7 @@ void Game::Begin(const RenderWindow& window)
 		cerr << "font load error!" << endl;
 		return;
 	}
+
 		
 	playerJudgementPercentageText.setFont(font);
 	playerJudgementPercentageText.setFillColor(Color::White);
@@ -57,6 +58,8 @@ void Game::Begin(const RenderWindow& window)
 	backgroundWhenPaused.setSize(Vector2f(1.f, 1.f));
 	backgroundWhenPaused.setFillColor(Color(0, 0, 0, 150)); // 알파값만 조정
 	backgroundWhenPaused.setOrigin(0.5f, 0.5f); // origin을 중심으로 맞추기
+
+	MenuManager::getInstance().init(window);
 
 	InitSkill();
 
@@ -96,6 +99,11 @@ Player& Game::getPlayer()
 	return player;
 }
 
+int& Game::getMenuState()
+{
+	return _menuState;
+}
+
 void Game::Restart()
 {
 	InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)
@@ -111,8 +119,26 @@ void Game::Restart()
 		object->Begin();
 }
 
-void Game::Update(float deltaTime)
+void Game::Update(float deltaTime, RenderWindow& window)
 {
+	if (_menuState == MenuIndex::EXIT)
+	{
+		window.close();
+		return;
+	}
+
+	if (MenuManager::getInstance().isInMenu()) return;
+
+	if (_menuState > StageIndex::STAGE_1)
+	{
+		cout << "Stage 2 이상은 아직 미구현" << endl;
+		_menuState = MenuIndex::STAGE_MENU;
+		MenuManager::getInstance().setMenu(MenuIndex::STAGE_MENU);
+		return;
+	}
+
+	
+
 	if (player._isDead && Keyboard::isKeyPressed(Keyboard::Enter)) // 플레이어 사망상태에서 Enter 눌러서 재시작
 		Restart(); 
 
@@ -129,6 +155,14 @@ void Game::Update(float deltaTime)
 
 void Game::Render(Renderer& renderer)
 {
+	if (MenuManager::getInstance().isInMenu())
+	{
+		MenuManager::getInstance().render(renderer);
+		return;
+	}
+
+	if (_menuState > StageIndex::STAGE_1) return; // 스테이지 2 이상은 아직 미구현
+
 	renderer._target.setView(camera.getView(renderer._target.getSize()));
 
 	float backGroundPositionX = _mapBound.left + _mapBound.width / 2;
@@ -147,6 +181,10 @@ void Game::Render(Renderer& renderer)
 
 void Game::RenderUI(Renderer& renderer)
 {
+	if (MenuManager::getInstance().isInMenu()) return;
+
+	if (_menuState > StageIndex::STAGE_1) return; // stage 2 이상은 아직 미구현
+
 	renderer._target.setView(camera.getUIView());
 
 	playerJudgementPercentageText.setPosition(-camera.getViewSize() / 2.f + Vector2f(2.f, 1.f)); // view 중심 (0, 0)으로부터 계산되는 position, 왼쪽 위로 설정됨

@@ -1,0 +1,25 @@
+#pragma once
+
+#include "MainMenu.h"
+#include "StageMenu.h"
+#include <memory>
+#include <vector>
+#include <iostream>
+
+class MenuManager {
+public:
+    static MenuManager& getInstance();
+    void init(RenderWindow& window);
+    void update(RenderWindow& window, const Event& event, float deltaTime, int& nextState);
+    void render(Renderer& renderer);
+    void setMenu(int menuIndex);
+    bool isInMenu();
+
+private:
+    MenuManager();
+    MenuManager(const MenuManager&) = delete;
+    MenuManager& operator=(const MenuManager&) = delete;
+
+    vector<unique_ptr<Menu>> menus;
+    int currentMenu;
+};

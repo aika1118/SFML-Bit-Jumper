@@ -3,6 +3,7 @@
 #include <SFML/System.hpp>
 #include "Game.h"
 #include "Renderer.h"
+#include "MenuManager.h"
 
 int main()
 {
@@ -10,7 +11,6 @@ int main()
 	Clock deltaClock;
 	Game &game = Game::getInstance();
 	Renderer renderer(window); // ∑ª¥ı∏µµ… ≈∏∞Ÿ¿ª window∑Œ ¡ˆ¡§
-
 	// window.setFramerateLimit(30);
 
 	game.Begin(window);
@@ -25,12 +25,14 @@ int main()
 		{
 			if (event.type == Event::Closed)
 				window.close();
+
+			if (MenuManager::getInstance().isInMenu())
+				MenuManager::getInstance().update(window, event, deltaTime, Game::getInstance().getMenuState());
 		}
 
 		window.clear();
 
-
-		game.Update(deltaTime);
+		game.Update(deltaTime, window);
 		game.Render(renderer);
 		game.RenderUI(renderer);
 

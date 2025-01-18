@@ -143,7 +143,9 @@
     <ClCompile Include="FixtureData.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MenuManager.cpp" />
     <ClCompile Include="SkillMeleeAttack.cpp" />
     <ClCompile Include="MyDebugDraw.cpp" />
     <ClCompile Include="MyGlobalContactListener.cpp" />
@@ -154,6 +156,7 @@
     <ClCompile Include="Resources.cpp" />
     <ClCompile Include="Skill.cpp" />
     <ClCompile Include="SkillManager.cpp" />
+    <ClCompile Include="StageMenu.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,7 +168,10 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="FixtureData.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="MenuManager.h" />
     <ClInclude Include="SkillMeleeAttack.h" />
     <ClInclude Include="MyDebugDraw.h" />
     <ClInclude Include="MyGlobalContactListener.h" />
@@ -176,6 +182,7 @@
     <ClInclude Include="Resources.h" />
     <ClInclude Include="Skill.h" />
     <ClInclude Include="SkillManager.h" />
+    <ClInclude Include="StageMenu.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>

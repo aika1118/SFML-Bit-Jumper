@@ -171,10 +171,10 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		// Player가 발 밑 센서로 적과 충돌한 경우 적 처치 처리 (적을 밟으면 죽일 수 있음)
 		if (selfData->type == FixtureDataType::PlayerSensor) 
 		{
+			cout << "Enemy Killed!" << endl;
 			enemy->destroyBody();
 			return;
 		}
-			
 
 		// enemy가 살아있고 player가 적과 일반적으로 충돌한 경우 피격처리
 		if (enemy->IsDead() == false)
