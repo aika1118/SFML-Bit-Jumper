@@ -29,8 +29,12 @@ public:
 	vector<vector<Texture*>> _grid; // 그리드에 그려질 texture 관리
 	float _cellSize = MAP_CELL_SIZE; // 그리드를 구성하는 셀 사이즈
 
+	string getMapImages(int stage);
+
 private:
 	Map(); // 외부에서 생성자 호출 불가하도록 설정
 	Map(const Map&) = delete; // 복사생성자 삭제
 	Map& operator=(const Map&) = delete; // 대입연산자 삭제
+	
+	unordered_map<int, string> mapImages;
 };

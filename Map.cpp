@@ -1,8 +1,15 @@
 #include "Map.h"
 #include "Game.h"
 
+string Map::getMapImages(int stage)
+{
+	return mapImages[stage];
+}
+
 Map::Map()
 {
+    for (int i = MapType::STAGE_1; i < MapType::END_OF_MAP_INDEX; ++i)
+        mapImages[i] = MAP_BASE_PATH + "STAGE_" + to_string(i + 1) + ".png";
 }
 
 Map& Map::getInstance()
@@ -13,6 +20,8 @@ Map& Map::getInstance()
 
 void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 {
+    if (image.getSize().x == 0 && image.getSize().y == 0) return; // image가 초기화되지 않은 상태
+
     _grid.clear();
     _grid = vector<vector<Texture*>>(image.getSize().x, vector<Texture*>(image.getSize().y, nullptr));
 

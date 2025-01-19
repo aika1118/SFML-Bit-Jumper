@@ -7,8 +7,15 @@ const float M_PI = 22.f / 7.f;
 
 // 맵 관련 설정
 const float MAP_CELL_SIZE = 1.f;
-const string MAP_STAGE_1 = "./resources/images/map.png";
+const string MAP_BASE_PATH = "./resources/images/";
 const bool MAP_IS_DEBUG_DRAW = true;
+enum MapType
+{
+    STAGE_1,
+    STAGE_2,
+    END_OF_MAP_INDEX
+};
+
 
 // 카메라 관련 설정
 const float CAMERA_ZOOM_LEVEL = 20.f;
@@ -72,19 +79,13 @@ const float SKILL_MELEE_ATTACK_SKILLTIME = 0.5f;
 const float GAME_OVER_LIMIT_TIME = (60.f) * (1000.f); // ms 단위 (해당 시간 잠수타면 게임 종료 처리)
 
 // 메뉴 관련 설정
-const int MENU_MAX_STAGE_NUM = 3;
+const int MENU_MAX_STAGE_NUM = 2;
 const int MENU_MAX_TYPE_NUM = 2;
 enum MenuIndex
 {
     EXIT = -1,
     MAIN_MENU,
     STAGE_MENU,
+    IN_PLAY,
     END_OF_MENU_INDEX
-};
-enum StageIndex
-{
-    START_OF_STAGE_INDEX = MenuIndex::END_OF_MENU_INDEX,
-    STAGE_1,
-    STAGE_2,
-    STAGE_3
 };

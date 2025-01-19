@@ -27,8 +27,8 @@ void Game::Begin(RenderWindow& window)
 			Resources::_sounds[file.path().filename().string()].loadFromFile(file.path().string()); // unordered_map에 texture 정보 저장
 	}
 
-	_mapImage.loadFromFile(MAP_STAGE_1);
-	_mapBound = FloatRect(0.f, 0.f, (float)_mapImage.getSize().x, (float)_mapImage.getSize().y); // 현재 mapBound 계산 (view가 맵 경계 벗어나지 않도록 하는 작업)
+	//_mapImage.loadFromFile(MAP_STAGE_1);
+	//_mapBound = FloatRect(0.f, 0.f, (float)_mapImage.getSize().x, (float)_mapImage.getSize().y); // 현재 mapBound 계산 (view가 맵 경계 벗어나지 않도록 하는 작업)
 
 	if (!font.loadFromFile("./resources/Fonts/ttf/BMDOHYEON_ttf.ttf"))
 	{
@@ -104,7 +104,24 @@ int& Game::getMenuState()
 	return _menuState;
 }
 
-void Game::Restart()
+int Game::getStageSelected()
+{
+	return _stageSelected;
+}
+
+void Game::setStageSelected(int stage)
+{
+	_stageSelected = stage;
+}
+
+void Game::setMapImage(int stage)
+{
+	_mapImage.loadFromFile(Map::getInstance().getMapImages(stage)); // load 실패할 때 예외처리 필요
+	_mapBound = FloatRect(0.f, 0.f, (float)_mapImage.getSize().x, (float)_mapImage.getSize().y); // 현재 mapBound 계산 (view가 맵 경계 벗어나지 않도록 하는 작업)
+	Restart();
+}
+
+void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정리 필요
 {
 	InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)
 	Physics::Init(); // 기존 world 초기화
@@ -128,15 +145,6 @@ void Game::Update(float deltaTime, RenderWindow& window)
 	}
 
 	if (MenuManager::getInstance().isInMenu()) return;
-
-	if (_menuState > StageIndex::STAGE_1)
-	{
-		cout << "Stage 2 이상은 아직 미구현" << endl;
-		_menuState = MenuIndex::STAGE_MENU;
-		MenuManager::getInstance().setMenu(MenuIndex::STAGE_MENU);
-		return;
-	}
-
 	
 
 	if (player._isDead && Keyboard::isKeyPressed(Keyboard::Enter)) // 플레이어 사망상태에서 Enter 눌러서 재시작
@@ -161,8 +169,6 @@ void Game::Render(Renderer& renderer)
 		return;
 	}
 
-	if (_menuState > StageIndex::STAGE_1) return; // 스테이지 2 이상은 아직 미구현
-
 	renderer._target.setView(camera.getView(renderer._target.getSize()));
 
 	float backGroundPositionX = _mapBound.left + _mapBound.width / 2;
@@ -182,8 +188,6 @@ void Game::Render(Renderer& renderer)
 void Game::RenderUI(Renderer& renderer)
 {
 	if (MenuManager::getInstance().isInMenu()) return;
-
-	if (_menuState > StageIndex::STAGE_1) return; // stage 2 이상은 아직 미구현
 
 	renderer._target.setView(camera.getUIView());
 

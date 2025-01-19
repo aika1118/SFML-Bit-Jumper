@@ -28,6 +28,8 @@ int main()
 
 			if (MenuManager::getInstance().isInMenu())
 				MenuManager::getInstance().update(window, event, deltaTime, Game::getInstance().getMenuState());
+
+			// 점프 처리도 event를 통해 진행하면 깔끔하게 구현이 되지 않을까 생각
 		}
 
 		window.clear();

@@ -30,7 +30,10 @@ void StageMenu::update(RenderWindow& window, const Event& event, float deltaTime
 		{
 			if (stageTexts[i].getGlobalBounds().contains(mousePos))
 			{
-				nextState = StageIndex::START_OF_STAGE_INDEX + (i + 1); // Stage i+i Ω√¿€
+				nextState = MenuIndex::IN_PLAY; 
+				Game::getInstance().setStageSelected(i);
+				Game::getInstance().setMapImage(i);
+
 				cout << "Stage " << i + 1 << " Selected" << endl;
 				break;
 			}

@@ -47,6 +47,9 @@ public:
 	bool getPlayerFacingLeft(); // player의 바라보는 방향 반환
 	Player& getPlayer(); 
 	int& getMenuState();
+	int getStageSelected();
+	void setStageSelected(int stage);
+	void setMapImage(int stage);
 
 
 private:
@@ -70,4 +73,5 @@ private:
 	FloatRect _mapBound;
 
 	int _menuState = MenuIndex::MAIN_MENU;
+	int _stageSelected = -1;
 };
