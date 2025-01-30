@@ -59,7 +59,7 @@ void Player::Begin()
 	body->CreateFixture(&sensorFixtureDef);
 
 	// 이외 멤버함수 초기화
-	_hp = 3;
+	_hp = PLAYER_MAX_HP;
 	_isDead = false;
 	_playerStatus = PlayerStatus::Idle;
 }
@@ -140,6 +140,18 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		++_coins;
 
 		//cout << "coins = " << _coins << endl;
+
+		return;
+	}
+
+	// player가 spike와 충돌한 경우 사망 처리
+	if (selfData->type == FixtureDataType::Player && otherData->type == FixtureDataType::Object && otherData->object->_tag == "spike")
+	{
+		cout << "Spike Attacked!" << endl;
+		_hp = max(0, _hp - 1);
+
+		if (_hp <= 0)
+			_isDead = true;
 
 		return;
 	}

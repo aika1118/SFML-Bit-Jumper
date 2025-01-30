@@ -13,6 +13,7 @@
 #include "FixtureData.h"
 #include "Coin.h"
 #include "Enemy.h"
+#include "Spike.h"
 
 
 using namespace sf;

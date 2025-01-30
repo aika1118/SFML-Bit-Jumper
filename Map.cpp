@@ -55,7 +55,8 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 object = new Enemy();
             else if (color == Color::Green)
                 _grid[x][y] = &Resources::_textures["save.png"];
-                
+            else if (color == Color(0, 255, 255))
+                object = new Spike();
 
             else
                 continue;
