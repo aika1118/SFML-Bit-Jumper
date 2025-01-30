@@ -41,6 +41,7 @@ void BoxFragile::Begin()
     FixtureData* fixtureData = new FixtureData();
     fixtureData->type = FixtureDataType::Object;
     fixtureData->object = this;
+    fixtureData->canJump = true;
 
     // fixture 정의 후 body 연결
     b2FixtureDef fixtureDef;

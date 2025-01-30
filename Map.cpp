@@ -91,6 +91,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 fixtureData->type = FixtureDataType::MapTile;
                 fixtureData->mapX = x;
                 fixtureData->mapY = y;
+                fixtureData->canJump = true;
 
                 b2FixtureDef fixtureDef;
                 fixtureDef.userData.pointer = (uintptr_t)fixtureData;

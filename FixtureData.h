@@ -25,6 +25,7 @@ struct FixtureData
 	ContactListener* listener;
 	FixtureDataType type;
 	bool isSkillAttacked;
+	bool canJump = false;
 
 	union // 한 공간을 공유하는 데이터 타입
 	{

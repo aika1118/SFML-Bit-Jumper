@@ -122,8 +122,8 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 	if (!selfData) return;
 	if (!otherData)	return;
 
-	// player가 MapTile과 맞닿은 경우 점프 가능하도록 처리
-	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile)
+	// player가 점프 가능한 Fixture와 맞닿은 경우 점프 가능하도록 처리 (mapTile, boxFragile)
+	if (selfData->type == FixtureDataType::PlayerSensor && otherData->canJump == true)
 	{
 		++_groundContactCount; 
 
@@ -270,7 +270,7 @@ void Player::OnEndContact(b2Fixture* self, b2Fixture* other)
 	if (!selfData) return;
 	if (!otherData)	return;
 
-	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile) // player가 mapTile과 멀어지는 경우
+	if (selfData->type == FixtureDataType::PlayerSensor && otherData->canJump == true) // player가 점프 fixture와 멀어지는 경우 (mapTile, boxFragile)
 	{
 		_groundContactCount = _groundContactCount > 0 ? --_groundContactCount : _groundContactCount;
 		return;
