@@ -66,6 +66,7 @@ private:
 
 	FixtureData _fixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
 	FixtureData _sensorFixtureData; // FixtureDef에 userData.pointer로 연결해서 body에 부착
+	FixtureData _headSensorFixtureData;
 
 	bool _isFirstGrounded = false; // 땅에 한번 닿을 때마다 값을 기억하기 위한 boolean
 	float _timeWhenJumpKeydown = 0.f; // 점프 시점 기록

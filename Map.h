@@ -14,6 +14,7 @@
 #include "Coin.h"
 #include "Enemy.h"
 #include "Spike.h"
+#include "BoxFragile.h"
 
 
 using namespace sf;

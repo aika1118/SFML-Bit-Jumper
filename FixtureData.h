@@ -13,6 +13,7 @@ enum class FixtureDataType
 {
 	Player,
 	PlayerSensor,
+	PlayerHeadSensor,
 	MapTile,
 	SaveTile,
 	Object,

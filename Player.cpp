@@ -58,6 +58,22 @@ void Player::Begin()
 
 	body->CreateFixture(&sensorFixtureDef);
 
+	// 캐릭터 머리 부분에 설치할 sensor
+
+	b2FixtureDef headSensorFixtureDef;
+	b2PolygonShape headSensorPolygonShape;
+
+	_headSensorFixtureData.listener = this;
+	_headSensorFixtureData.player = this;
+	_headSensorFixtureData.type = FixtureDataType::PlayerHeadSensor;
+
+	headSensorFixtureDef.userData.pointer = (uintptr_t)&_headSensorFixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
+	headSensorPolygonShape.SetAsBox(PLAYER_HEAD_SENSOR_HX, PLAYER_HEAD_SENSOR_HY, b2Vec2(0.f, -PLAYER_SIZE_HEIGHT / 2.f), 0.f);
+	headSensorFixtureDef.isSensor = true; // sensor : 충돌을 감지하지만 물리적인 상호작용은 하지 않는 특수한 fixture
+	headSensorFixtureDef.shape = &headSensorPolygonShape;
+
+	body->CreateFixture(&headSensorFixtureDef);
+
 	// 이외 멤버함수 초기화
 	_hp = PLAYER_MAX_HP;
 	_isDead = false;
@@ -106,8 +122,8 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 	if (!selfData) return;
 	if (!otherData)	return;
 
-	// player가 mapTile과 닿아있는 경우
-	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile) 
+	// player가 MapTile과 맞닿은 경우 점프 가능하도록 처리
+	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::MapTile)
 	{
 		++_groundContactCount; 
 
@@ -123,6 +139,24 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		}
 
 		//cout << "Player is on MapTile. Init Progressed !" << endl;
+
+		return;
+	}
+
+	// PlayerHeadSensor가 BoxFragile과 닫은 경우 box hp를 1 감소 시킴 (머리 박치기로 특수 박스와 부딪힌 경우 박스 HP를 1씩 감소시킴)
+	if (selfData->type == FixtureDataType::PlayerHeadSensor && otherData->type == FixtureDataType::Object && otherData->object->_tag == "box_fragile")
+	{
+		cout << "box head attack!" << endl;
+		BoxFragile* box = dynamic_cast<BoxFragile*>(otherData->object); // 안전하게 다운 캐스팅 (otherData->object가 BoxFragile*이 아닐경우 nullptr-return)
+		if (!box) return;
+		
+		box->TakeDamage(); // 박스 박치기 하면 hp 1씩 줄어들며 그에 해당하는 texture로 rendering 될 것
+
+		if (box->getHP() < 0)
+		{
+			box->destroyBody(); // world에서 body를 destroy (정확히는 삭제 대기리스트에만 일단 추가 후 Physics에서 step 계산 후 일괄적으로 destroyBody 진행)
+			Game::getInstance().DeleteObject(otherData->object); // object를 destroy하여 더이상 해당 object에 대해 update, render되지 않도록 함
+		}
 
 		return;
 	}
@@ -144,8 +178,8 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
-	// player가 spike와 충돌한 경우 사망 처리
-	if (selfData->type == FixtureDataType::Player && otherData->type == FixtureDataType::Object && otherData->object->_tag == "spike")
+	// player 발판과 spike와 충돌한 경우 사망 처리
+	if (selfData->type == FixtureDataType::PlayerSensor && otherData->type == FixtureDataType::Object && otherData->object->_tag == "spike")
 	{
 		cout << "Spike Attacked!" << endl;
 		_hp = max(0, _hp - 1);

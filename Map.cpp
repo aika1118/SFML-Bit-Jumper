@@ -57,6 +57,8 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 _grid[x][y] = &Resources::_textures["save.png"];
             else if (color == Color(0, 255, 255))
                 object = new Spike();
+            else if (color == Color(255, 0, 255))
+                object = new BoxFragile();
 
             else
                 continue;
@@ -84,7 +86,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 
                 b2ChainShape chain;
                 chain.CreateLoop(&vs[0], 4);
-
+                    
                 FixtureData* fixtureData = new FixtureData();
                 fixtureData->type = FixtureDataType::MapTile;
                 fixtureData->mapX = x;

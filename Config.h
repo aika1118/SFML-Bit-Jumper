@@ -26,6 +26,8 @@ const float PLAYER_SIZE_WIDTH = 1.f;
 const float PLAYER_SIZE_HEIGHT = (PLAYER_SIZE_WIDTH * PLAYER_SIZE_RATIO);
 const float PLAYER_SENSOR_HX = (PLAYER_SIZE_WIDTH / 2.f) * 0.8f;
 const float PLAYER_SENSOR_HY = 0.1f;
+const float PLAYER_HEAD_SENSOR_HX = (PLAYER_SIZE_WIDTH / 2.f) * 0.9f;
+const float PLAYER_HEAD_SENSOR_HY = 0.1f;
 const int PLAYER_MAX_JUMP_COUNT = 1;
 const float PLAYER_INVINCIBILITY_TIME = 1.f;
 const int PLAYER_MAX_HP = 1;
@@ -65,8 +67,9 @@ const float ENEMY_DESTROY_TIME = 2.f;
 const float ENEMY_STOP_TIME_AFTER_ATTACKED = 1.f;
 
 // 오브젝트 관련 설정
-const float OBJECT_COIN_SIZE = 0.8f;
+const float OBJECT_COIN_SIZE = 1.f;
 const float OBJECT_SPIKE_SIZE = 1.f;
+const float OBJECT_BOX_FRAGILE_SIZE = 1.f;
 
 // UI 관련 설정
 const float UI_VIEW_SIZE = 100.f;
