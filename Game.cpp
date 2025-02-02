@@ -21,11 +21,11 @@ void Game::Begin(RenderWindow& window)
 			Resources::_textures[file.path().filename().string()].loadFromFile(file.path().string()); // unordered_map에 texture 정보 저장
 	}
 
-	for (const auto& file : filesystem::directory_iterator("./resources/sounds/")) // sound 불러오기
-	{
-		if (file.is_regular_file() && (file.path().extension() == ".ogg" || file.path().extension() == ".wav"))
-			Resources::_sounds[file.path().filename().string()].loadFromFile(file.path().string()); // unordered_map에 texture 정보 저장
-	}
+	//for (const auto& file : filesystem::directory_iterator("./resources/sounds/")) // sound 불러오기
+	//{
+	//	if (file.is_regular_file() && (file.path().extension() == ".ogg" || file.path().extension() == ".wav"))
+	//		Resources::_sounds[file.path().filename().string()].loadFromFile(file.path().string()); // unordered_map에 texture 정보 저장
+	//}
 
 	//_mapImage.loadFromFile(MAP_STAGE_1);
 	//_mapBound = FloatRect(0.f, 0.f, (float)_mapImage.getSize().x, (float)_mapImage.getSize().y); // 현재 mapBound 계산 (view가 맵 경계 벗어나지 않도록 하는 작업)

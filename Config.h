@@ -94,3 +94,9 @@ enum MenuIndex
     IN_PLAY,
     END_OF_MENU_INDEX
 };
+
+// DB 관련 설정
+const string DB_HOST = "tcp://35.247.65.229:3306";
+const string DB_USERNAME = "wskang";
+const string DB_PASSWORD = "Angelic3545!@";
+const string DB_SCHEMA = "trip_plan"; // DB 이름 
