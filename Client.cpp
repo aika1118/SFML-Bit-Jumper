@@ -13,14 +13,17 @@ void Client::send_packet_async(PacketType type, const string& data)
 	header.type = type; // 패킷 종류 설정
 	header.size = data.size(); // 패킷 바디 크기 설정
 
+	// data를 shared_ptr로 감싸서 안전하게 관리
+	shared_ptr<string> data_ptr = make_shared<string>(data);
+
 	// 패킷 헤더와 바디를 버퍼에 추가
 	vector<const_buffer> buffers;
 	buffers.push_back(buffer(&header, sizeof(header)));
-	buffers.push_back(buffer(data));
+	buffers.push_back(buffer(*data_ptr)); // shared_ptr에서 실제 data를 가져와서 버퍼에 추가
 
 	// 서버에 패킷 전송
 	async_write(_socket, buffers, 
-		[this](boost::system::error_code ec, size_t length)
+		[this, data_ptr](boost::system::error_code ec, size_t length) // data_ptr을 캡처하여 비동기 작업 중에 안전하게 유지
 		{
 			if (!ec)
 			{
