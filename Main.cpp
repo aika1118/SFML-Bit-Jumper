@@ -7,7 +7,6 @@
 #include "MenuManager.h"
 #include <thread>
 #include <mysql/jdbc.h>
-#include "Server.h"
 #include "Client.h"
 #include <boost/asio.hpp>
 #include "Config.h"

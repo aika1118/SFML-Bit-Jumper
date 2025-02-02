@@ -153,8 +153,6 @@
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MenuManager.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="Session.cpp" />
     <ClCompile Include="SkillMeleeAttack.cpp" />
     <ClCompile Include="MyDebugDraw.cpp" />
     <ClCompile Include="MyGlobalContactListener.cpp" />
@@ -185,8 +183,6 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuManager.h" />
     <ClInclude Include="Packet.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="Session.h" />
     <ClInclude Include="SkillMeleeAttack.h" />
     <ClInclude Include="MyDebugDraw.h" />
     <ClInclude Include="MyGlobalContactListener.h" />
