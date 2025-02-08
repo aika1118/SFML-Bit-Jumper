@@ -2,6 +2,7 @@
 
 #include "MainMenu.h"
 #include "StageMenu.h"
+#include "MenuClear.h"
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -12,7 +13,7 @@ public:
     void init(RenderWindow& window);
     void update(RenderWindow& window, const Event& event, float deltaTime, int& nextState);
     void render(Renderer& renderer);
-    void setMenu(int menuIndex);
+    void setCurrentMenu(int menuIndex);
     bool isInMenu();
 
 private:

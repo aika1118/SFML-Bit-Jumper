@@ -47,6 +47,7 @@ public:
 
 	float getJudgementPercentage();
 	string getJudgementCurrent();
+	int getCurrentClearStage();
 
 private:
 	void HandleMove(float deltaTime, b2Vec2& velocity);
@@ -82,4 +83,7 @@ private:
 
 	PlayerStatus _playerStatus;
 	int _currentSkillId;
+
+	int _currentClearStage = -1; // 현재 클리어한 스테이지
+	unordered_map<int, float> _stageScores; // 스테이지 클리어 점수 기록
 };

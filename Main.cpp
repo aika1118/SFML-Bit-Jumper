@@ -20,6 +20,7 @@ int main()
 	// window.setFramerateLimit(30);
 
 	/*******************클라이언트 연결 테스트 코드 시작*****************/
+	/*
 	try
 	{
 		io_context io_context; // I/O 컨텍스트 생성
@@ -39,6 +40,7 @@ int main()
 	{
 		cerr << "Exception: " << e.what() << "\n"; // 예외처리
 	}
+	*/
 	/*******************클라이언트 연결 테스트 코드 종료************************/
 
 	game.Begin(window);
@@ -55,7 +57,10 @@ int main()
 				window.close();
 
 			if (MenuManager::getInstance().isInMenu())
+			{	
+				//cout << "Menu State : " << Game::getInstance().getMenuState() << endl;
 				MenuManager::getInstance().update(window, event, deltaTime, Game::getInstance().getMenuState());
+			}
 
 			// 점프 처리도 event를 통해 진행하면 깔끔하게 구현이 되지 않을까 생각
 		}

@@ -16,6 +16,7 @@ void MenuManager::init(RenderWindow& window)
 {
     menus.push_back(make_unique<MainMenu>());
     menus.push_back(make_unique<StageMenu>());
+    menus.push_back(make_unique<MenuClear>());
 
     for (const auto& menu : menus) 
     {
@@ -26,7 +27,7 @@ void MenuManager::init(RenderWindow& window)
 
 void MenuManager::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)
 {
-    setMenu(nextState);
+    setCurrentMenu(nextState);
 
     if (currentMenu >= 0 && currentMenu < menus.size()) 
     {
@@ -42,7 +43,7 @@ void MenuManager::render(Renderer& renderer)
 	}
 }
 
-void MenuManager::setMenu(int menuIndex)
+void MenuManager::setCurrentMenu(int menuIndex)
 {
     currentMenu = menuIndex;
 }

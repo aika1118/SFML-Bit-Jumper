@@ -61,6 +61,8 @@ void Game::Begin(RenderWindow& window)
 
 	MenuManager::getInstance().init(window);
 
+	setPlayerId(PLAYER_TEMP_ID);
+
 	InitSkill();
 
 	Restart();
@@ -121,6 +123,42 @@ void Game::setMapImage(int stage)
 	Restart();
 }
 
+void Game::setMenuState(int menuState)
+{
+	_menuState = menuState;
+}
+
+int Game::getPlayerCurrentClearStage(int id)
+{
+	return _playerCurrentClearStages[id];
+}
+
+void Game::setPlayerCurrentClearStage(int id, int stage)
+{
+	_playerCurrentClearStages[id] = stage;
+}
+
+float Game::getPlayerStageScore(int id, int stage)
+{
+	return _playerStageScores[id][stage];
+}
+
+void Game::setPlayerStageScore(int id, int stage, float score)
+{
+	_playerStageScores[id][stage] = score;
+}
+
+int Game::getPlayerId()
+{
+	return _playerId;
+}
+
+void Game::setPlayerId(int id)
+{
+	_playerId = id;
+	_playerCurrentClearStages[_playerId] = -1; // 처음 player id 부여할 때 클리어한 스테이지를 -1로 초기화
+}
+
 void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정리 필요
 {
 	InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)
@@ -138,10 +176,19 @@ void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정
 
 void Game::Update(float deltaTime, RenderWindow& window)
 {
+	MenuManager::getInstance().setCurrentMenu(_menuState);
+
 	if (_menuState == MenuIndex::EXIT)
 	{
 		window.close();
 		return;
+	}
+
+	if (_menuState == MenuIndex::CLEAR_MENU)
+	{
+		Game::getInstance().InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)
+		Physics::Init(); // 기존 world 초기화
+		player = Player(); // 임시 객체를 생성하고, 복사 대입 연산자로 새로 초기화
 	}
 
 	if (MenuManager::getInstance().isInMenu()) return;
@@ -165,6 +212,7 @@ void Game::Render(Renderer& renderer)
 {
 	if (MenuManager::getInstance().isInMenu())
 	{
+		renderer._target.setView(renderer._target.getDefaultView()); // 메뉴 UI 표시를 위해 window default view로 회귀
 		MenuManager::getInstance().render(renderer);
 		return;
 	}

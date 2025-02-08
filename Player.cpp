@@ -259,6 +259,31 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		// 최근 세이브 장소를 Game 클래스에 기록
 		Game::getInstance()._savePositionX = curSaveX;
 		Game::getInstance()._savePositionY = curSaveY;
+
+		return;
+	}
+
+	// player가 exit 타일과 충돌한 경우 게임 종료 처리
+	if (selfData->type == FixtureDataType::Player && otherData->type == FixtureDataType::ExitTile)
+	{
+		cout << "Stage : " << Game::getInstance().getStageSelected() + 1 << " Cleared" << endl;
+		cout << "Current Percentage : " << _judgementPercentage << endl;
+
+		// 게임 결과 기록
+
+		// [player]에 기록되는 정보는 구지 없어도 될지도 ? Game에 player id 별로 저장되고 있기 떄문
+		_currentClearStage = Game::getInstance().getStageSelected();
+		_stageScores[Game::getInstance().getStageSelected()] = _judgementPercentage;
+
+		// [Game]에 현재 클리어 스테이지 및 점수를 저장
+		Game::getInstance().setPlayerCurrentClearStage(Game::getInstance().getPlayerId(), _currentClearStage);
+		Game::getInstance().setPlayerStageScore(Game::getInstance().getPlayerId(), _currentClearStage, _judgementPercentage);
+
+
+		// state를 게임 종료 메뉴로 설정
+		Game::getInstance().setMenuState(MenuIndex::CLEAR_MENU);
+
+		return;
 	}
 }
 
@@ -285,6 +310,11 @@ float Player::getJudgementPercentage()
 string Player::getJudgementCurrent()
 {
 	return _judgementCurrent;
+}
+
+int Player::getCurrentClearStage()
+{
+	return _currentClearStage;
 }
 
 void Player::HandleMove(float deltaTime, b2Vec2& velocity)

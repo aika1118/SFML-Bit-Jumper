@@ -50,6 +50,16 @@ public:
 	int getStageSelected();
 	void setStageSelected(int stage);
 	void setMapImage(int stage);
+	void setMenuState(int menuState);
+
+	int getPlayerCurrentClearStage(int id);
+	void setPlayerCurrentClearStage(int id, int stage);
+
+	float getPlayerStageScore(int id, int stage);
+	void setPlayerStageScore(int id, int stage, float score);
+
+	int getPlayerId();
+	void setPlayerId(int id);
 
 
 private:
@@ -74,4 +84,9 @@ private:
 
 	int _menuState = MenuIndex::MAIN_MENU;
 	int _stageSelected = -1;
+
+	int _playerId = PLAYER_TEMP_ID;
+
+	unordered_map<int, int> _playerCurrentClearStages;
+	unordered_map<int, unordered_map<int, float>> _playerStageScores;
 };

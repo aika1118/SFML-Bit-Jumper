@@ -59,6 +59,8 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 object = new Spike();
             else if (color == Color(255, 0, 255))
                 object = new BoxFragile();
+            else if (color == Color(200, 200, 200))
+				_grid[x][y] = &Resources::_textures["exit.png"];
 
             else
                 continue;
@@ -87,7 +89,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 b2ChainShape chain;
                 chain.CreateLoop(&vs[0], 4);
                     
-                FixtureData* fixtureData = new FixtureData();
+                FixtureData* fixtureData = new FixtureData(); // FixtureData를 객체 안에 두고 unique_ptr로 객체 소멸 관리해야할듯 함
                 fixtureData->type = FixtureDataType::MapTile;
                 fixtureData->mapX = x;
                 fixtureData->mapY = y;
@@ -124,6 +126,32 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 sensorFixtureDef.shape = &sensorPolygonShape;
 
                 body->CreateFixture(&sensorFixtureDef);
+
+                continue;
+            }
+
+            if (_grid[x][y] == &Resources::_textures["exit.png"])
+            {
+				b2BodyDef bodyDef; // 타일의 물리적 몸체 정의
+				bodyDef.position.Set(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f);
+				b2Body* body = Physics::world->CreateBody(&bodyDef); // body = 새로 생성된 몸체에 대해 포인터로 참조가능
+
+				b2FixtureDef sensorFixtureDef;
+				b2PolygonShape sensorPolygonShape;
+                FixtureData* fixtureData = new FixtureData();
+
+                fixtureData->type = FixtureDataType::ExitTile;
+                fixtureData->mapX = x;
+                fixtureData->mapY = y;
+
+                sensorFixtureDef.userData.pointer = (uintptr_t)fixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
+                sensorPolygonShape.SetAsBox(_cellSize / 2.f, _cellSize / 2.f);
+                sensorFixtureDef.isSensor = true; // sensor : 충돌을 감지하지만 물리적인 상호작용은 하지 않는 특수한 fixture
+                sensorFixtureDef.shape = &sensorPolygonShape;
+
+                body->CreateFixture(&sensorFixtureDef);
+
+                continue;
             }
             
         }

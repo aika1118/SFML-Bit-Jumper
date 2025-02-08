@@ -26,7 +26,9 @@ void StageMenu::update(RenderWindow& window, const Event& event, float deltaTime
 	if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left)
 	{
 		Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-		for (int i = 0; i < stageTexts.size(); ++i)
+		int currentClearStage = Game::getInstance().getPlayerCurrentClearStage(Game::getInstance().getPlayerId());
+
+		for (int i = 0; i <= currentClearStage + 1; ++i) // 현재 클리어한 스테이지 + 1 이하의 스테이지만 선택 가능 (도전 가능한 스테이지 까지만 선택 가능)
 		{
 			if (stageTexts[i].getGlobalBounds().contains(mousePos))
 			{
@@ -43,8 +45,13 @@ void StageMenu::update(RenderWindow& window, const Event& event, float deltaTime
 
 void StageMenu::render(Renderer& renderer)
 {
-	for (const auto& stageText : stageTexts)
+	int currentClearStage = Game::getInstance().getPlayerCurrentClearStage(Game::getInstance().getPlayerId());
+
+	for (int i = 0; i < stageTexts.size(); ++i)
 	{
-		renderer._target.draw(stageText);
+		if (i > currentClearStage + 1) stageTexts[i].setFillColor(Color(100, 100, 100)); // 현재 클리어한 스테이지 + 2 부터는 선택 불가하므로 Text 음영처리
+		else stageTexts[i].setFillColor(Color::White);
+
+		renderer._target.draw(stageTexts[i]);
 	}
 }

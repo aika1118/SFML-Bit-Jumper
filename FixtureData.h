@@ -16,6 +16,7 @@ enum class FixtureDataType
 	PlayerHeadSensor,
 	MapTile,
 	SaveTile,
+	ExitTile,
 	Object,
 	Attack
 };
