@@ -4,6 +4,15 @@
 Game::Game() // 참조자 멤버변수 초기화
 	:gameMap(Map::getInstance()), camera(Camera::getInstance())
 {
+	try
+	{
+		client = new Client(io_context, SERVER_HOST, SERVER_PORT); // 클라이언트 생성
+		cout << "Client Connected !" << endl;
+	}
+	catch (const std::exception& e)
+	{
+		cerr << "Exception: " << e.what() << "\n"; // 예외처리
+	}
 }
 
 Game& Game::getInstance()
@@ -157,6 +166,16 @@ void Game::setPlayerId(int id)
 {
 	_playerId = id;
 	_playerCurrentClearStages[_playerId] = -1; // 처음 player id 부여할 때 클리어한 스테이지를 -1로 초기화
+}
+
+Client* Game::getClient()
+{
+	return client;
+}
+
+io_context& Game::getIoContext()
+{
+	return io_context;
 }
 
 void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정리 필요

@@ -14,6 +14,9 @@
 #include "SkillMeleeAttack.h"
 #include "Util.h"
 #include "MenuManager.h"
+#include "Client.h"
+#include <boost/asio.hpp>
+#include <thread>
 
 using namespace sf;
 using namespace std;
@@ -61,6 +64,9 @@ public:
 	int getPlayerId();
 	void setPlayerId(int id);
 
+	Client* getClient();
+	io_context& getIoContext();
+
 
 private:
 	Game(); // 외부에서 생성자 호출 불가하도록 설정
@@ -89,4 +95,7 @@ private:
 
 	unordered_map<int, int> _playerCurrentClearStages;
 	unordered_map<int, unordered_map<int, float>> _playerStageScores;
+	
+	Client* client; // Client 객체 참조
+	io_context io_context;
 };
