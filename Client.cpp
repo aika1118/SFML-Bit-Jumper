@@ -2,15 +2,20 @@
 
 Client::Client(io_context& io_context, const string& host, const string& port)
 	:_socket(io_context), _io_context(io_context), _work_guard(make_work_guard(_io_context))
+		,_thread_pool(thread::hardware_concurrency()) // cpu 코어 개수만큼 스레드 풀 생성
 {
 	tcp::resolver resolver(io_context); // 호스트와 포트를 해결
 	connect(_socket, resolver.resolve(host, port)); // 서버에 연결
 
-	// io_context 실행을 위한 별도 스레드 생성 (서버 요청에 대한 응답을 받을 때 비동기적으로 동작 가능)
-	_io_thread = thread([this]() {
-		cout << "Client io_context running..." << endl;
-		_io_context.run();  // io_context 실행 (작업이 없더라도 종료되지 않도록 work_guard로 유지중)
-	});
+	// io_context 실행을 위한 별도 스레드 풀 생성 (서버 요청에 대한 응답을 받을 때 비동기적으로 동작 가능)
+	// io_context 내부 작업 큐에서 빈 스레드에게 작업을 분배(즉, 멀티스레드 처리 가능)
+	// 클라이언트에서 동시에 여러개의 요청을 서버로 보내게 될 경우 멀티스레드로 극복 가능
+	for (unsigned int i = 0; i < thread::hardware_concurrency(); ++i) {
+		boost::asio::post(_thread_pool, [this]() {
+			//cout << "Client io_context running on thread " << this_thread::get_id() << endl;
+			_io_context.run();
+		});
+	}
 }
 
 Client::~Client()
@@ -34,7 +39,10 @@ void Client::send_packet_async(PacketType type, const string& data)
 	buffers.push_back(buffer(&header, sizeof(header)));
 	buffers.push_back(buffer(*data_ptr)); // shared_ptr에서 실제 data를 가져와서 버퍼에 추가
 
+	cout << "Sending packet with size: " << header.size << endl;
+
 	// 서버에 패킷 전송
+	// io_context.run()이 멀티스레드 환경에서 큐에 있는 작업들을 처리하고 있기 때문에, 추가적인 post 호출은 불필요할것
 	async_write(_socket, buffers, 
 		[this, data_ptr](boost::system::error_code ec, size_t length) // data_ptr을 캡처하여 비동기 작업 중에 안전하게 유지
 		{
