@@ -1,4 +1,5 @@
 #include "Client.h"
+#include "MenuManager.h"
 
 Client::Client(io_context& io_context, const string& host, const string& port)
 	:_socket(io_context), _io_context(io_context), _work_guard(make_work_guard(_io_context))
@@ -66,26 +67,57 @@ bool Client::isConnected() const
 void Client::receive_response()
 {
 	cout << "[Receive response]" << endl;
-	shared_ptr<uint32_t> response_size = make_shared<uint32_t>(); // 응답 크기를 저장할 변수
-	async_read(_socket, buffer(response_size.get(), sizeof(uint32_t)),
-		[this, response_size](boost::system::error_code ec, size_t length)
+
+	// 1. 먼저 패킷 헤더를 읽음 (type + size)
+	shared_ptr<PacketHeader> header = make_shared<PacketHeader>();
+	async_read(_socket, buffer(header.get(), sizeof(PacketHeader)),
+		[this, header](boost::system::error_code ec, size_t length)
 		{
 			if (!ec)
 			{
 				// 응답 크기를 받은 후 그 크기만큼 응답 본문을 읽기
-				cout << "Response size: " << *response_size << endl;
+				cout << "Packet Type: " << header->type << ", Data Size: " << header->size << endl;
 
-				// 응답 크기에 맞는 크기의 버퍼 생성
-				shared_ptr<string> response = make_shared<string>(*response_size, '\0');
-
-				// 응답 본문 읽기
+				// 2. 패킷 데이터 읽기 (response 사이즈에 맞게 읽기)
+				shared_ptr<string> response = make_shared<string>(header->size, '\0');
 				async_read(_socket, buffer(*response),
-					[this, response](boost::system::error_code ec, size_t length)
+					[this, header, response](boost::system::error_code ec, size_t length)
 					{
 						if (!ec)
 						{
 							// 응답 출력
 							cout << "[Response]" << endl << *response << endl;
+
+							MenuCreateUserName* menuCreateUserName = nullptr;
+							// 패킷 타입에 따른 차등 처리
+							switch (header->type)
+							{
+								case PACKET_CREATE:
+									// uid 저장을 위해 Util::setUID() 호출
+									cout << "PACKET_CREATE process call!" << endl;
+									Util::setUID(stoi(response->c_str()));
+									cout << "uid saved: " << Util::getUID() << endl;
+									break;
+
+								case PACKET_CREATE_ERROR:
+									// 닉네임 입력 메뉴에서 닉네임을 다시 입력하도록 처리
+									cout << "PACKET_CREATE_ERROR process call!" << endl;
+									menuCreateUserName = dynamic_cast<MenuCreateUserName*>(MenuManager::getInstance().getMenu(MenuIndex::MAKE_USERNAME_MENU)); // 안전하게 다운캐스팅 (menuCreateUserName*이 아닐경우 nullptr 반환)
+									if (!menuCreateUserName)
+									{
+										cout << "menuCreateUserName is null!" << endl;
+									}
+									else
+									{
+										menuCreateUserName->setErrorText("Try with a different name.");
+									}
+
+									break;
+
+								default:
+									break;
+							}
+
 						}
 						else
 						{

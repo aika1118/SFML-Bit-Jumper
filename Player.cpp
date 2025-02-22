@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Game.h" // 순환참조 회피
 
+
 void Player::Begin()
 {
 	// Animation Frame 정의
@@ -82,6 +83,8 @@ void Player::Begin()
 
 void Player::Update(float deltaTime)
 {
+	_clearTime += deltaTime; // 초단위 저장
+	cout << _clearTime << endl;
 	_position = Vector2f(body->GetPosition().x, body->GetPosition().y); // Physics::Update()에서 world.Step에 의해 프레임 당 물리 계산 적용중, 이로 인해 body position 변화 발생
 	_angle = body->GetAngle() * (180.f / M_PI); // 라디안에서 도(degree) 변환
 	b2Vec2 velocity = body->GetLinearVelocity();
@@ -110,9 +113,6 @@ void Player::Draw(Renderer& renderer)
 	renderer.Draw(_textureToDraw, _position, Vector2f(_facingLeft ? -PLAYER_SIZE_WIDTH : PLAYER_SIZE_WIDTH, PLAYER_SIZE_HEIGHT), _angle); // 캐릭터가 왼쪽 바라보면 size.x에 음수 적용
 }
 
-Player::~Player()
-{
-}
 
 void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 {
@@ -276,14 +276,14 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		_stageScores[Game::getInstance().getStageSelected()] = _judgementPercentage;
 
 		// [Game]에 현재 클리어 스테이지 및 점수를 저장
-		Game::getInstance().setPlayerCurrentClearStage(Game::getInstance().getPlayerId(), _currentClearStage);
-		Game::getInstance().setPlayerStageScore(Game::getInstance().getPlayerId(), _currentClearStage, _judgementPercentage);
+		Game::getInstance().setPlayerCurrentClearStage(Game::getInstance().getUid(), _currentClearStage);
+		Game::getInstance().setPlayerStageScore(Game::getInstance().getUid(), _currentClearStage, _judgementPercentage);
 
 		// 서버에 id, 스테이지, 점수, 시간 정보를 패킷으로 전달
-		string data = to_string(Game::getInstance().getPlayerId()) + "," 
+		string data = to_string(Game::getInstance().getUid()) + ","
 					+ to_string(_currentClearStage) + "," 
 					+ to_string(_judgementPercentage) + "," 
-					+ "123.123";
+					+ to_string(_clearTime);
 		Game::getInstance().getClient()->send_packet_async(PACKET_WRITE,data);	
 
 		// state를 게임 종료 메뉴로 설정

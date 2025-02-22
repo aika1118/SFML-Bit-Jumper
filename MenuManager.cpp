@@ -14,9 +14,11 @@ MenuManager& MenuManager::getInstance()
 
 void MenuManager::init(RenderWindow& window)
 {
+    // 새로운 매뉴 추가 후 push_back 필요
     menus.push_back(make_unique<MainMenu>());
     menus.push_back(make_unique<StageMenu>());
     menus.push_back(make_unique<MenuClear>());
+    menus.push_back(make_unique<MenuCreateUserName>());
 
     for (const auto& menu : menus) 
     {
@@ -51,5 +53,12 @@ void MenuManager::setCurrentMenu(int menuIndex)
 bool MenuManager::isInMenu()
 {   
     return currentMenu >= 0 && currentMenu < menus.size();
+}
+
+Menu* MenuManager::getMenu(int menuIndex)
+{
+    if (menuIndex >= 0 && menuIndex < menus.size()) return menus[menuIndex].get(); 
+    
+    return nullptr;
 }
 

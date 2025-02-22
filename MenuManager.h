@@ -3,6 +3,7 @@
 #include "MainMenu.h"
 #include "StageMenu.h"
 #include "MenuClear.h"
+#include "MenuCreateUserName.h"
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -15,6 +16,7 @@ public:
     void render(Renderer& renderer);
     void setCurrentMenu(int menuIndex);
     bool isInMenu();
+    Menu* getMenu(int menuIndex);
 
 private:
     MenuManager();

@@ -153,6 +153,7 @@
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MenuClear.cpp" />
+    <ClCompile Include="MenuCreateUserName.cpp" />
     <ClCompile Include="MenuManager.cpp" />
     <ClCompile Include="SkillMeleeAttack.cpp" />
     <ClCompile Include="MyDebugDraw.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuClear.h" />
+    <ClInclude Include="MenuCreateUserName.h" />
     <ClInclude Include="MenuManager.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="SkillMeleeAttack.h" />

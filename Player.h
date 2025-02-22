@@ -32,7 +32,6 @@ public:
 	void Begin();
 	void Update(float deltaTime);
 	void Draw(Renderer& renderer);
-	~Player();
 
 	virtual void OnBeginContact(b2Fixture* self, b2Fixture* other) override;
 	virtual void OnEndContact(b2Fixture* self, b2Fixture* other) override;
@@ -86,4 +85,6 @@ private:
 
 	int _currentClearStage = -1; // 현재 클리어한 스테이지
 	unordered_map<int, float> _stageScores; // 스테이지 클리어 점수 기록
+
+	float _clearTime = 0.f;
 };

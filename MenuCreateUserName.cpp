@@ -1,0 +1,145 @@
+#include "MenuCreateUserName.h"
+
+void MenuCreateUserName::init(RenderWindow& window)
+{
+    if (!_font.loadFromFile("./resources/Fonts/ttf/BMDOHYEON_ttf.ttf"))
+    {
+        cout << "No font is here" << endl;
+        return;
+    }
+
+    // "닉네임을 입력하세요." 텍스트
+    _infoText.setFont(_font);
+    _infoText.setFillColor(Color::White);
+    _infoText.setString("Create a username");
+    _infoText.setCharacterSize(40);
+    _infoText.setOrigin(_infoText.getLocalBounds().width / 2, _infoText.getLocalBounds().height / 2);
+    _infoText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 - 70.f);
+
+    // inputbox
+	_inputBox.setSize(Vector2f(300.f, 50.f));
+	_inputBox.setFillColor(Color::White);
+	_inputBox.setOrigin(_inputBox.getLocalBounds().width / 2, _inputBox.getLocalBounds().height / 2);
+	_inputBox.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+
+    // inputText (inputbox에 표시될 Text)
+	_inputText.setFont(_font);
+	_inputText.setFillColor(Color::Black);
+	_inputText.setCharacterSize(40);
+	_inputText.setOrigin(_inputText.getLocalBounds().width / 2, _inputText.getLocalBounds().height / 2);
+	_inputText.setPosition((float)window.getSize().x / 2 - (float)_inputBox.getLocalBounds().width / 2 + 15.f, (float)window.getSize().y / 2 - 28.f);
+
+    // cursorText
+	_cursorText.setFont(_font);
+	_cursorText.setFillColor(Color::Black);
+	_cursorText.setString("|");
+	_cursorText.setCharacterSize(40);
+	_cursorText.setOrigin(_cursorText.getLocalBounds().width / 2, _cursorText.getLocalBounds().height / 2);
+	_cursorText.setPosition((float)window.getSize().x / 2 - (float)_inputBox.getLocalBounds().width / 2 + 5.f, (float)window.getSize().y / 2 - 10.f);
+
+    // submitText
+    _submitText.setFont(_font);
+    _submitText.setFillColor(Color::White);
+    _submitText.setString("Submit");
+    _submitText.setCharacterSize(40);
+    _submitText.setOrigin(_submitText.getLocalBounds().width / 2, _submitText.getLocalBounds().height / 2);
+    _submitText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 100.f);
+
+    // submitBox
+	_submitBox.setSize(Vector2f(180.f, 50.f));
+    _submitBox.setFillColor(Color::Transparent);
+	_submitBox.setOutlineColor(Color::White);
+    _submitBox.setOutlineThickness(2.f);
+	_submitBox.setOrigin(_submitBox.getLocalBounds().width / 2, _submitBox.getLocalBounds().height / 2);
+	_submitBox.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 115.f);
+
+    // errorText
+	_errorText.setFont(_font);
+	_errorText.setFillColor(Color::Red);
+	_errorText.setCharacterSize(20);
+	_errorText.setOrigin(_errorText.getLocalBounds().width / 2, _errorText.getLocalBounds().height / 2);
+	_errorText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 200.f);
+}
+
+void MenuCreateUserName::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)
+{
+    // inputBox 영역을 클릭한 경우 cursor 표시를 위한 cursorOn = true 처리
+    if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left)
+    {
+        Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+        if (_inputBox.getGlobalBounds().contains(mousePos))
+        {
+            _cursorOn = true;
+            return;
+        }
+        
+        _cursorOn = false;
+
+        // submit 버튼을 누른 경우 submit 처리
+        if (_submitBox.getGlobalBounds().contains(mousePos))
+        {
+            if (_inputString.empty())
+			{
+				cout << "cannot submit empty string" << endl; // 차후 인게임에서 확인할 수 있도록 변경 필요
+				return;
+			}
+
+            cout << "submit success: " << _inputString << endl;
+            // Server에 닉네임 저장 및 uid 발급을 위한 패킷전송
+            Game::getInstance().getClient()->send_packet_async(PACKET_CREATE, _inputString);
+
+
+            return;
+        }
+
+        return;
+    }
+
+    // 키보드 타이핑이 감지된 경우 inputText에 키보드 입력을 담기
+    if (event.type == Event::TextEntered)
+    {
+        if (!_cursorOn) return; // 커서 포커스 되어있을 때만 입력처리
+
+        // 백스페이스 처리
+        if (event.text.unicode == 8) 
+        {
+            if (_inputString.empty()) return;
+
+            _inputString.pop_back();
+            _inputText.setString(_inputString);
+            return;
+        }
+
+        // 일반 문자 입력 (6글자 제한)
+        if (event.text.unicode < 128 && _inputString.size() < SETTING_USERNAME_MAX_LENGTH)
+		{
+            // _errorText 초기화
+            _errorText.setString("");
+
+			_inputString += (char)event.text.unicode;
+			_inputText.setString(_inputString);
+            return;
+		}
+    }
+}
+
+void MenuCreateUserName::render(Renderer& renderer)
+{
+    renderer._target.draw(_infoText);
+    renderer._target.draw(_inputBox);
+    renderer._target.draw(_inputText);
+    renderer._target.draw(_submitText);
+    renderer._target.draw(_submitBox);
+
+    // 에러메세지는 서버 요청 후 string이 써지기 때문에 origin 및 position 재조정
+    _errorText.setOrigin(_errorText.getLocalBounds().width / 2, _errorText.getLocalBounds().height / 2);
+    _errorText.setPosition((float)renderer._target.getSize().x / 2, (float)renderer._target.getSize().y / 2 + 200.f);
+    renderer._target.draw(_errorText);
+
+    if (_cursorOn) renderer._target.draw(_cursorText);
+}
+
+void MenuCreateUserName::setErrorText(string text)
+{
+    _errorText.setString(text);
+}

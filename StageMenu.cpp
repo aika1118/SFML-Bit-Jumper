@@ -26,7 +26,7 @@ void StageMenu::update(RenderWindow& window, const Event& event, float deltaTime
 	if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left)
 	{
 		Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-		int currentClearStage = Game::getInstance().getPlayerCurrentClearStage(Game::getInstance().getPlayerId());
+		int currentClearStage = Game::getInstance().getPlayerCurrentClearStage(Game::getInstance().getUid());
 
 		for (int i = 0; i <= currentClearStage + 1; ++i) // 현재 클리어한 스테이지 + 1 이하의 스테이지만 선택 가능 (도전 가능한 스테이지 까지만 선택 가능)
 		{
@@ -45,7 +45,7 @@ void StageMenu::update(RenderWindow& window, const Event& event, float deltaTime
 
 void StageMenu::render(Renderer& renderer)
 {
-	int currentClearStage = Game::getInstance().getPlayerCurrentClearStage(Game::getInstance().getPlayerId());
+	int currentClearStage = Game::getInstance().getPlayerCurrentClearStage(Game::getInstance().getUid());
 
 	for (int i = 0; i < stageTexts.size(); ++i)
 	{

@@ -70,8 +70,6 @@ void Game::Begin(RenderWindow& window)
 
 	MenuManager::getInstance().init(window);
 
-	setPlayerId(PLAYER_TEMP_ID);
-
 	InitSkill();
 
 	Restart();
@@ -157,16 +155,6 @@ void Game::setPlayerStageScore(int id, int stage, float score)
 	_playerStageScores[id][stage] = score;
 }
 
-int Game::getPlayerId()
-{
-	return _playerId;
-}
-
-void Game::setPlayerId(int id)
-{
-	_playerId = id;
-	_playerCurrentClearStages[_playerId] = -1; // 처음 player id 부여할 때 클리어한 스테이지를 -1로 초기화
-}
 
 Client* Game::getClient()
 {
@@ -176,6 +164,16 @@ Client* Game::getClient()
 io_context& Game::getIoContext()
 {
 	return io_context;
+}
+
+int Game::getUid()
+{
+	return _uid;
+}
+
+string Game::getUsername()
+{
+	return _username;
 }
 
 void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정리 필요
@@ -195,6 +193,25 @@ void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정
 
 void Game::Update(float deltaTime, RenderWindow& window)
 {
+	if (!_isUidInited) // uid가 초기화 될때까지 해당 if조건에 계속 걸리게됨
+	{
+		// 현재 닉네임 생성 메뉴에 있다면 return
+		if (_menuState == MenuIndex::MAKE_USERNAME_MENU) return;
+
+		_uid = Util::getUID();
+
+		// 아직 세팅파일에 uid가 없는 경우
+		if (_uid == SETTING_UID_NOT_INITED) setMenuState(MenuIndex::MAKE_USERNAME_MENU); // 닉네임 생성 메뉴로 이동
+
+		else // 정상적인 uid를 얻은 경우
+		{
+			_username = Util::getUserName(_uid); // uid를 얻은 경우 username도 get 하기
+			_menuState = MenuIndex::MAIN_MENU; // 메인 메뉴로 이동
+			_playerCurrentClearStages[_uid] = -1; // 게임 클라이언트를 새로 킨 경우 클리어한 스테이지를 -1로 초기화
+			_isUidInited = true;
+		}
+	}
+
 	MenuManager::getInstance().setCurrentMenu(_menuState);
 
 	if (_menuState == MenuIndex::EXIT)

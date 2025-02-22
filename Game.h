@@ -61,11 +61,11 @@ public:
 	float getPlayerStageScore(int id, int stage);
 	void setPlayerStageScore(int id, int stage, float score);
 
-	int getPlayerId();
-	void setPlayerId(int id);
-
 	Client* getClient();
 	io_context& getIoContext();
+
+	int getUid();
+	string getUsername();
 
 
 private:
@@ -91,11 +91,14 @@ private:
 	int _menuState = MenuIndex::MAIN_MENU;
 	int _stageSelected = -1;
 
-	int _playerId = PLAYER_TEMP_ID;
-
 	unordered_map<int, int> _playerCurrentClearStages;
 	unordered_map<int, unordered_map<int, float>> _playerStageScores;
 	
 	Client* client; // Client 객체 참조
 	io_context io_context;
+
+	int _uid = SETTING_UID_NOT_INITED; // 유저 고유 UID
+	string _username; // 유저 이름 (uid로 플레이어를 구분하고 있기 때문에 username은 다른 유저와 중복되도 상관없음)
+
+	bool _isUidInited = false; // _uid를 초기화 했는지 저장
 };
