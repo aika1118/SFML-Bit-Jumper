@@ -84,7 +84,6 @@ void Player::Begin()
 void Player::Update(float deltaTime)
 {
 	_clearTime += deltaTime; // 초단위 저장
-	cout << _clearTime << endl;
 	_position = Vector2f(body->GetPosition().x, body->GetPosition().y); // Physics::Update()에서 world.Step에 의해 프레임 당 물리 계산 적용중, 이로 인해 body position 변화 발생
 	_angle = body->GetAngle() * (180.f / M_PI); // 라디안에서 도(degree) 변환
 	b2Vec2 velocity = body->GetLinearVelocity();
