@@ -4,6 +4,7 @@
 #include "StageMenu.h"
 #include "MenuClear.h"
 #include "MenuCreateUserName.h"
+#include "MenuRanking.h"
 #include <memory>
 #include <vector>
 #include <iostream>

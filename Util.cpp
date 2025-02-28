@@ -86,6 +86,14 @@ string Util::getUserName(int uid)
 	return string();
 }
 
+bool Util::isServerConnected()
+{
+	if (Game::getInstance().getClient() == nullptr) return false;
+	if (SERVER_USING_CONNECTION == false) return false;
+
+	return true;
+}
+
 
 
 

@@ -20,4 +20,5 @@ public:
 	static int getUID();
 	static void setUID(int uid);
 	static string getUserName(int uid);
+	static bool isServerConnected();
 };

@@ -88,37 +88,61 @@ void Client::receive_response()
 							// 응답 출력
 							cout << "[Response]" << endl << *response << endl;
 
-							MenuCreateUserName* menuCreateUserName = nullptr;
-							// 패킷 타입에 따른 차등 처리
-							switch (header->type)
+							if (header->type == PACKET_CREATE)
 							{
-								case PACKET_CREATE:
-									// uid 저장을 위해 Util::setUID() 호출
-									cout << "PACKET_CREATE process call!" << endl;
-									Util::setUID(stoi(response->c_str()));
-									cout << "uid saved: " << Util::getUID() << endl;
-									break;
+								// uid 저장을 위해 Util::setUID() 호출
+								cout << "PACKET_CREATE process call!" << endl;
+								Util::setUID(stoi(response->c_str()));
+								cout << "uid saved: " << Util::getUID() << endl;
 
-								case PACKET_CREATE_ERROR:
-									// 닉네임 입력 메뉴에서 닉네임을 다시 입력하도록 처리
-									cout << "PACKET_CREATE_ERROR process call!" << endl;
-									menuCreateUserName = dynamic_cast<MenuCreateUserName*>(MenuManager::getInstance().getMenu(MenuIndex::MAKE_USERNAME_MENU)); // 안전하게 다운캐스팅 (menuCreateUserName*이 아닐경우 nullptr 반환)
-									if (!menuCreateUserName)
-									{
-										cout << "menuCreateUserName is null!" << endl;
-									}
-									else
-									{
-										menuCreateUserName->setErrorText("Try with a different name.");
-									}
-
-									break;
-
-								default:
-									break;
+								return;
 							}
 
-						}
+							if (header->type == PACKET_CREATE_ERROR)
+							{
+								// 닉네임 입력 메뉴에서 닉네임을 다시 입력하도록 처리
+								cout << "PACKET_CREATE_ERROR process call!" << endl;
+								MenuCreateUserName* menuCreateUserName = dynamic_cast<MenuCreateUserName*>(MenuManager::getInstance().getMenu(MenuIndex::MAKE_USERNAME_MENU)); // 안전하게 다운캐스팅 (menuCreateUserName*이 아닐경우 nullptr 반환)
+								if (!menuCreateUserName)
+								{
+									cout << "menuCreateUserName is null!" << endl;
+								}
+								else
+								{
+									menuCreateUserName->setErrorText("Try with a different name.");
+								}
+
+								return;
+							}
+
+							if (header->type == PACKET_READ_RANKING)
+							{
+								cout << "PACKET_READ_RANKING process call!" << endl;
+								MenuRanking* menuRanking = dynamic_cast<MenuRanking*>(MenuManager::getInstance().getMenu(MenuIndex::RANKING_MENU)); // 안전하게 다운캐스팅 (해당 형식이 아닐경우 nullptr 반환)
+								if (!menuRanking)
+								{
+									cout << "menuRanking is null!" << endl;
+									return;
+								}
+
+								// 한줄씩 데이터를 읽어서 username, score 데이터를 parameter로 넘기기 
+								stringstream ss(*response);
+								string line;
+
+								while (getline(ss, line))
+								{
+									stringstream lineStream(line);
+									string name;
+									string score;
+
+									// space로 구분된 name, score 읽은 후 rankData에 삽입
+									if (lineStream >> name >> score) 
+										menuRanking->pushRankData(name, score); 
+								}
+
+								return;
+							}
+				}
 						else
 						{
 							cerr << "Error reading response: " << ec.message() << endl;

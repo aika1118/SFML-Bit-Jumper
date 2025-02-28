@@ -19,6 +19,7 @@ void MenuManager::init(RenderWindow& window)
     menus.push_back(make_unique<StageMenu>());
     menus.push_back(make_unique<MenuClear>());
     menus.push_back(make_unique<MenuCreateUserName>());
+    menus.push_back(make_unique<MenuRanking>());
 
     for (const auto& menu : menus) 
     {

@@ -4,6 +4,8 @@
 Game::Game() // 참조자 멤버변수 초기화
 	:gameMap(Map::getInstance()), camera(Camera::getInstance())
 {
+	if (SERVER_USING_CONNECTION == false) return; // 서버 연결을 원하지 않는 경우 (config.h에서 값 관리)
+
 	try
 	{
 		client = new Client(io_context, SERVER_HOST, SERVER_PORT); // 클라이언트 생성

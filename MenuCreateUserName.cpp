@@ -86,7 +86,8 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
 
             cout << "submit success: " << _inputString << endl;
             // Server에 닉네임 저장 및 uid 발급을 위한 패킷전송
-            Game::getInstance().getClient()->send_packet_async(PACKET_CREATE, _inputString);
+            if (Util::isServerConnected())
+                Game::getInstance().getClient()->send_packet_async(PACKET_CREATE, _inputString);
 
 
             return;
@@ -109,6 +110,9 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
             _inputText.setString(_inputString);
             return;
         }
+
+        // 스페이스 처리 (스페이스는 이름에 허용하지 않음)
+        if (event.text.unicode == 32) return;
 
         // 일반 문자 입력 (6글자 제한)
         if (event.text.unicode < 128 && _inputString.size() < SETTING_USERNAME_MAX_LENGTH)

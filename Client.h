@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "Packet.h"
 #include "Util.h"
 

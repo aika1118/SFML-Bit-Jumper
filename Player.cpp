@@ -283,7 +283,9 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 					+ to_string(_currentClearStage) + "," 
 					+ to_string(_judgementPercentage) + "," 
 					+ to_string(_clearTime);
-		Game::getInstance().getClient()->send_packet_async(PACKET_WRITE,data);	
+
+		if (Util::isServerConnected())
+			Game::getInstance().getClient()->send_packet_async(PACKET_WRITE,data);	
 
 		// state를 게임 종료 메뉴로 설정
 		Game::getInstance().setMenuState(MenuIndex::CLEAR_MENU);

@@ -99,6 +99,9 @@
     <ClCompile Include="MenuCreateUserName.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="MenuRanking.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -189,6 +192,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MenuCreateUserName.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuRanking.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

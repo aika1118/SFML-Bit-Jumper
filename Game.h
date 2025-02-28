@@ -94,7 +94,7 @@ private:
 	unordered_map<int, int> _playerCurrentClearStages;
 	unordered_map<int, unordered_map<int, float>> _playerStageScores;
 	
-	Client* client; // Client 객체 참조
+	Client* client = nullptr; // Client 객체 참조
 	io_context io_context;
 
 	int _uid = SETTING_UID_NOT_INITED; // 유저 고유 UID
