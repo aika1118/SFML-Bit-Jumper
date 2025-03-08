@@ -209,7 +209,14 @@ void Game::Update(float deltaTime, RenderWindow& window)
 		{
 			_username = Util::getUserName(_uid); // uid를 얻은 경우 username도 get 하기
 			_menuState = MenuIndex::MAIN_MENU; // 메인 메뉴로 이동
-			_playerCurrentClearStages[_uid] = -1; // 게임 클라이언트를 새로 킨 경우 클리어한 스테이지를 -1로 초기화
+
+			// uid에 해당하는 최신 clear stage를 아래 const 값으로 초기화 (실제 db값 받기전에 로딩중을 알리는 처리를 하기 위함 in StageMenu.cpp)
+			_playerCurrentClearStages[_uid] = SETTING_PLAYER_CURRENT_CLEAR_STAGE_NOT_INITED;
+			
+			// uid에 해당하는 최신 clear stage 정보 받아오기
+			client->send_packet_async(PACKET_READ_MAX_CLEAR_STAGE, to_string(_uid));
+			
+
 			_isUidInited = true;
 		}
 	}

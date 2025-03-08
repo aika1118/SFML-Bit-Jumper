@@ -142,6 +142,14 @@ void Client::receive_response()
 
 								return;
 							}
+
+							if (header->type == PACKET_READ_MAX_CLEAR_STAGE)
+							{
+								cout << "PACKET_READ_STAGE process call!" << endl;
+								// uid에 해당하는 가장 높이 클리어했던 stage 저장
+								Game::getInstance().setPlayerCurrentClearStage(Game::getInstance().getUid(), stoi(response->c_str()));
+								return;
+							}
 				}
 						else
 						{

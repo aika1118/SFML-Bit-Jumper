@@ -40,7 +40,9 @@ void MainMenu::update(RenderWindow& window, const Event& event, float deltaTime,
     {
         Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
         if (_playText.getGlobalBounds().contains(mousePos))
+        { 
             nextState = MenuIndex::STAGE_MENU; // StageMenu로 이동
+        }
         else if (_exitText.getGlobalBounds().contains(mousePos))
             nextState = MenuIndex::EXIT; // 게임 종료
         else if (_rankingText.getGlobalBounds().contains(mousePos))
