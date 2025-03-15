@@ -28,6 +28,7 @@ void MainMenu::init(RenderWindow& window)
     // Ranking
     _rankingText.setFont(_font);
     _rankingText.setFillColor(Color::White);
+    if (Game::getInstance().isServerConnected() == false) _rankingText.setFillColor(Color(100, 100, 100)); // 오프라인 모드인 경우 Ranking 음영처리
     _rankingText.setString("Ranking");
     _rankingText.setCharacterSize(60);
     _rankingText.setOrigin(_rankingText.getLocalBounds().width / 2, _rankingText.getLocalBounds().height / 2);
@@ -47,11 +48,10 @@ void MainMenu::update(RenderWindow& window, const Event& event, float deltaTime,
             nextState = MenuIndex::EXIT; // 게임 종료
         else if (_rankingText.getGlobalBounds().contains(mousePos))
         {
-            nextState = MenuIndex::RANKING_MENU; // 랭킹 메뉴
+            if (Game::getInstance().isServerConnected() == false) return; // offline 모드인 경우 랭킹 진입을 허용하지 않음
 
-            // 서버에서 랭킹 데이터 받아오기
-            if (Util::isServerConnected()) 
-                Game::getInstance().getClient()->send_packet_async(PACKET_READ_RANKING, "");
+            nextState = MenuIndex::RANKING_MENU; // 랭킹 메뉴
+            Game::getInstance().getClient()->send_packet_async(PACKET_READ_RANKING, "");
         }
     }
 }

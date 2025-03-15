@@ -4,11 +4,16 @@
 Game::Game() // 참조자 멤버변수 초기화
 	:gameMap(Map::getInstance()), camera(Camera::getInstance())
 {
-	if (SERVER_USING_CONNECTION == false) return; // 서버 연결을 원하지 않는 경우 (config.h에서 값 관리)
+	if (Util::checkServerConnection() == false)
+	{
+		cout << "Offline Mode !" << endl;
+		_isServerConnected = false;
+		return; // 서버 연결을 원하지 않는 경우 (config.h에서 값 관리)
+	}
 
 	try
 	{
-		client = new Client(io_context, SERVER_HOST, SERVER_PORT); // 클라이언트 생성
+		client = new Client(io_context, SERVER_IP, SERVER_PORT); // 클라이언트 생성
 		cout << "Client Connected !" << endl;
 	}
 	catch (const std::exception& e)
@@ -71,6 +76,9 @@ void Game::Begin(RenderWindow& window)
 	backgroundWhenPaused.setOrigin(0.5f, 0.5f); // origin을 중심으로 맞추기
 
 	MenuManager::getInstance().init(window);
+
+	// 서버연결 안되어있으면 진행 스테이지 상황을 기본값으로 초기화 (_uid는 이미 SETTING_UID_NOT_INITED 값으로 초기화되어있음)
+	if (_isServerConnected == false) setPlayerCurrentClearStage(_uid, PLAYER_DEFAULT_STAGE);
 
 	InitSkill();
 
@@ -157,6 +165,11 @@ void Game::setPlayerStageScore(int id, int stage, float score)
 	_playerStageScores[id][stage] = score;
 }
 
+bool Game::isServerConnected()
+{
+	return _isServerConnected;
+}
+
 
 Client* Game::getClient()
 {
@@ -195,7 +208,7 @@ void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정
 
 void Game::Update(float deltaTime, RenderWindow& window)
 {
-	if (!_isUidInited) // uid가 초기화 될때까지 해당 if조건에 계속 걸리게됨
+	if (_isServerConnected && !_isUidInited) // uid가 초기화 될때까지 해당 if조건에 계속 걸리게됨
 	{
 		// 현재 닉네임 생성 메뉴에 있다면 return
 		if (_menuState == MenuIndex::MAKE_USERNAME_MENU) return;
@@ -214,8 +227,10 @@ void Game::Update(float deltaTime, RenderWindow& window)
 			_playerCurrentClearStages[_uid] = SETTING_PLAYER_CURRENT_CLEAR_STAGE_NOT_INITED;
 			
 			// uid에 해당하는 최신 clear stage 정보 받아오기
-			client->send_packet_async(PACKET_READ_MAX_CLEAR_STAGE, to_string(_uid));
-			
+			if (Game::getInstance().isServerConnected())
+				client->send_packet_async(PACKET_READ_MAX_CLEAR_STAGE, to_string(_uid));
+			else // Update() if 조건에서 서버연결을 확인했지만 혹시 몰라 예외처리
+				setPlayerCurrentClearStage(_uid, PLAYER_DEFAULT_STAGE);
 
 			_isUidInited = true;
 		}

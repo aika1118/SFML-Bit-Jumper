@@ -86,12 +86,35 @@ string Util::getUserName(int uid)
 	return string();
 }
 
-bool Util::isServerConnected()
+bool Util::checkServerConnection()
 {
-	if (Game::getInstance().getClient() == nullptr) return false;
-	if (SERVER_USING_CONNECTION == false) return false;
+	if (SERVER_OFFLINE_MODE == true) return false;
 
-	return true;
+
+	try
+	{
+		io_context io_context;
+
+		// TCP 엔드포인트 생성
+		tcp::resolver resolver(io_context);
+		tcp::resolver::results_type endpoints = resolver.resolve(SERVER_IP, SERVER_PORT);
+
+		// 소켓 생성
+		tcp::socket socket(io_context);
+
+		// 연결 시도 (타임아웃 없이 기본 연결)
+		connect(socket, endpoints);
+
+		// 연결 성공 시 소켓 닫기
+		socket.close();
+		return true;
+	}
+	catch (const exception& e)
+	{
+		cerr << "Exception: " << e.what() << "\n"; // 예외처리
+		return false;
+	}
+	
 }
 
 

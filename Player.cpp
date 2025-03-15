@@ -278,14 +278,18 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		Game::getInstance().setPlayerCurrentClearStage(Game::getInstance().getUid(), _currentClearStage);
 		Game::getInstance().setPlayerStageScore(Game::getInstance().getUid(), _currentClearStage, _judgementPercentage);
 
-		// 서버에 id, 스테이지, 점수, 시간 정보를 패킷으로 전달
-		string data = to_string(Game::getInstance().getUid()) + ","
-					+ to_string(_currentClearStage) + "," 
-					+ to_string(_judgementPercentage) + "," 
-					+ to_string(_clearTime);
+		if (Game::getInstance().isServerConnected())
+		{
+			// 서버에 id, 스테이지, 점수, 시간 정보를 패킷으로 전달
+			string data = to_string(Game::getInstance().getUid()) + ","
+				+ to_string(_currentClearStage) + ","
+				+ to_string(_judgementPercentage) + ","
+				+ to_string(_clearTime);
 
-		if (Util::isServerConnected())
-			Game::getInstance().getClient()->send_packet_async(PACKET_WRITE,data);	
+			// DB에 게임 결과를 저장 (DB 저장 후 추가 작업은 없음, 메모리에는 이미 결과가 저장되어 있는 상태)
+			Game::getInstance().getClient()->send_packet_async(PACKET_WRITE, data);
+		}
+			
 
 		// state를 게임 종료 메뉴로 설정
 		Game::getInstance().setMenuState(MenuIndex::CLEAR_MENU);

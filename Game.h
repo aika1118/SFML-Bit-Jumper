@@ -60,6 +60,7 @@ public:
 
 	float getPlayerStageScore(int id, int stage);
 	void setPlayerStageScore(int id, int stage, float score);
+	bool isServerConnected();
 
 	Client* getClient();
 	io_context& getIoContext();
@@ -101,4 +102,5 @@ private:
 	string _username; // 유저 이름 (uid로 플레이어를 구분하고 있기 때문에 username은 다른 유저와 중복되도 상관없음)
 
 	bool _isUidInited = false; // _uid를 초기화 했는지 저장
+	bool _isServerConnected = true;
 };

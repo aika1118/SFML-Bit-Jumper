@@ -86,7 +86,7 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
 
             cout << "submit success: " << _inputString << endl;
             // Server에 닉네임 저장 및 uid 발급을 위한 패킷전송
-            if (Util::isServerConnected())
+            if (Game::getInstance().isServerConnected())
                 Game::getInstance().getClient()->send_packet_async(PACKET_CREATE, _inputString);
 
 
