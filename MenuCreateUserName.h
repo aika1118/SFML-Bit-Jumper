@@ -25,5 +25,9 @@ private:
 	Text _submitText;
 	RectangleShape _submitBox;
 	Text _errorText;
+	Text _loadingText;
 	bool _cursorOn = false;
+
+	bool _isUidCreateRequestSended = false;
+	bool _isUidCreated = false;
 };

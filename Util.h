@@ -7,6 +7,7 @@
 #include <fstream>
 #include "json.hpp"
 #include "Config.h"
+#include "Packet.h"
 
 using namespace std;
 using namespace nlohmann;
@@ -22,4 +23,8 @@ public:
 	static string getUserName(int uid);
 
 	static bool checkServerConnection();
+	static bool getPacketWaitStatus(int packet_id);
+	static void setPacketWaitStatus(int packet_id, bool status);
+
+	inline static vector<bool> _PacketWaitStatus = vector<bool>(PAKCET_TYPE_MAX_NUM, false); // 각 PACKET 요청에 대해 기다리고 있는지 상태를 저장하는 vector (1 = 기다리는중, 0 = 기다리지 않는중)
 };

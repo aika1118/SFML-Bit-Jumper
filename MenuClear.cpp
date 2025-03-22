@@ -43,6 +43,9 @@ void MenuClear::init(RenderWindow& window)
 
 void MenuClear::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)
 {
+    // 아직 패킷 요청에 대해 wait 상태인 경우 로딩중 처리
+    if (Util::getPacketWaitStatus(PACKET_WRITE) == true) return;
+
     if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left)
     {
         Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
@@ -53,7 +56,12 @@ void MenuClear::update(RenderWindow& window, const Event& event, float deltaTime
 
 void MenuClear::render(Renderer& renderer)
 {
-    
+    if (Util::getPacketWaitStatus(PACKET_WRITE) == true) // 아직 패킷 요청에 대해 wait 상태인 경우 로딩중 처리
+    {
+        renderer._target.draw(_loadingText);
+        return;
+    }
+
     renderer._target.draw(_clearText);
 
     // score를 현재 클리어한 스테이지 점수를 get한 후 출력

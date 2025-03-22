@@ -59,10 +59,21 @@ void MenuCreateUserName::init(RenderWindow& window)
 	_errorText.setCharacterSize(20);
 	_errorText.setOrigin(_errorText.getLocalBounds().width / 2, _errorText.getLocalBounds().height / 2);
 	_errorText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 200.f);
+
+    // Loading... 텍스트
+    _loadingText.setFont(_font);
+    _loadingText.setFillColor(Color::White);
+    _loadingText.setString("Loading...");
+    _loadingText.setCharacterSize(40);
+    _loadingText.setOrigin(_loadingText.getLocalBounds().width / 2, _loadingText.getLocalBounds().height / 2);
+    _loadingText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
 }
 
 void MenuCreateUserName::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)
 {
+    // uid 생성 요청 보냈고 아직 서버에서 응답을 받지 못하였다면 로딩중 처리
+    if (_isUidCreateRequestSended && !_isUidCreated) return;
+        
     // inputBox 영역을 클릭한 경우 cursor 표시를 위한 cursorOn = true 처리
     if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left)
     {
@@ -87,13 +98,14 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
             cout << "submit success: " << _inputString << endl;
             // Server에 닉네임 저장 및 uid 발급을 위한 패킷전송
             if (Game::getInstance().isServerConnected())
+                _isUidCreateRequestSended = true;
                 Game::getInstance().getClient()->send_packet_async(PACKET_CREATE, _inputString,
-                    [](const string& response) { // 콜백 정의
+                    [this](const string& response) { // 콜백 정의
                         // uid 저장을 위해 Util::setUID() 호출
                         cout << "PACKET_CREATE callback!" << endl;
                         Util::setUID(stoi(response));
                         cout << "uid saved: " << Util::getUID() << endl;
-
+                        _isUidCreated = true;
                         return;
                     }
                 );
@@ -138,6 +150,11 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
 
 void MenuCreateUserName::render(Renderer& renderer)
 {
+    if (_isUidCreateRequestSended && !_isUidCreated) // uid 생성 요청 보냈고 아직 서버에서 응답을 받지 못하였다면 로딩중처리
+    {
+        renderer._target.draw(_loadingText);
+        return;
+    }
     renderer._target.draw(_infoText);
     renderer._target.draw(_inputBox);
     renderer._target.draw(_inputText);
