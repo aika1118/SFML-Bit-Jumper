@@ -12,25 +12,33 @@ void MenuClear::init(RenderWindow& window)
     _clearText.setFont(_font);
     _clearText.setFillColor(Color::White);
     _clearText.setString("Clear!");
-    _clearText.setCharacterSize(60);
+    _clearText.setCharacterSize(50);
     _clearText.setOrigin(_clearText.getLocalBounds().width / 2, _clearText.getLocalBounds().height / 2);
-    _clearText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 - 60);
+    _clearText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 - 100);
 
     // Score
     _scoreText.setFont(_font);
     _scoreText.setFillColor(Color::White);
     _scoreText.setString("Score");
-    _scoreText.setCharacterSize(60);
+    _scoreText.setCharacterSize(50);
     _scoreText.setOrigin(_scoreText.getLocalBounds().width / 2, _scoreText.getLocalBounds().height / 2);
-    _scoreText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 60);
+    _scoreText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 20);
 
     // Ok
 	_okText.setFont(_font);
 	_okText.setFillColor(Color::White);
 	_okText.setString("OK");
-	_okText.setCharacterSize(60);
+	_okText.setCharacterSize(50);
 	_okText.setOrigin(_okText.getLocalBounds().width / 2, _okText.getLocalBounds().height / 2);
-	_okText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 180);
+	_okText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 140);
+
+    // Loading... 텍스트
+    _loadingText.setFont(_font);
+    _loadingText.setFillColor(Color::White);
+    _loadingText.setString("Loading...");
+    _loadingText.setCharacterSize(40);
+    _loadingText.setOrigin(_loadingText.getLocalBounds().width / 2, _loadingText.getLocalBounds().height / 2);
+    _loadingText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
 }
 
 void MenuClear::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)
@@ -53,7 +61,7 @@ void MenuClear::render(Renderer& renderer)
     int stage = Game::getInstance().getPlayerCurrentClearStage(id); // 현재 player가 클리어한 스테이지
     _scoreText.setString("Score : " + to_string(Game::getInstance().getPlayerStageScore(id, stage)));
     _scoreText.setOrigin(_scoreText.getLocalBounds().width / 2, _scoreText.getLocalBounds().height / 2); // text origin 재설정
-    _scoreText.setPosition((float)renderer._target.getSize().x / 2, (float)renderer._target.getSize().y / 2 + 60); // text position 재설정
+    _scoreText.setPosition((float)renderer._target.getSize().x / 2, (float)renderer._target.getSize().y / 2 + 20); // text position 재설정
     renderer._target.draw(_scoreText);
 
     renderer._target.draw(_okText);

@@ -228,7 +228,14 @@ void Game::Update(float deltaTime, RenderWindow& window)
 			
 			// uid에 해당하는 최신 clear stage 정보 받아오기
 			if (Game::getInstance().isServerConnected())
-				client->send_packet_async(PACKET_READ_MAX_CLEAR_STAGE, to_string(_uid));
+				client->send_packet_async(PACKET_READ_MAX_CLEAR_STAGE, to_string(_uid),
+					[](const string& response) { // 콜백 정의
+						cout << "PACKET_READ_MAX_CLEAR_STAGE callback!" << endl;
+						// uid에 해당하는 가장 높이 클리어했던 stage 저장
+						Game::getInstance().setPlayerCurrentClearStage(Game::getInstance().getUid(), stoi(response));
+						return;
+					}
+				);
 			else // Update() if 조건에서 서버연결을 확인했지만 혹시 몰라 예외처리
 				setPlayerCurrentClearStage(_uid, PLAYER_DEFAULT_STAGE);
 

@@ -19,4 +19,5 @@ private:
 	Text _clearText;
 	Text _scoreText;
 	Text _okText;
+	Text _loadingText;
 };

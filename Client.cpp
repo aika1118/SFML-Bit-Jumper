@@ -45,13 +45,17 @@ Client::~Client()
 		_io_thread.join(); // 스레드가 끝날때까지 대기
 }
 
-void Client::send_packet_async(PacketType type, const string& data)
+void Client::send_packet_async(PacketType type, const string& data, Callback cb = nullptr)
 {
 	// strand를 통해 비동기 작업을 순차화
-	post(_strand, [this, type, data]() {
+	post(_strand, [this, type, data, cb]() {
+		uint32_t request_id = _request_counter++; // 패킷 요청에 대한 고유 ID 생성
+		if (cb) _callbacks[request_id] = cb; // 콜백 저장
+
 		PacketHeader header;
 		header.type = type; // 패킷 종류 설정
 		header.size = data.size(); // 패킷 바디 크기 설정
+		header.request_id = request_id; // 패킷 요청에 대한 고유 ID 
 
 		// data를 shared_ptr로 감싸서 안전하게 관리
 		shared_ptr<string> data_ptr = make_shared<string>(data);
@@ -90,7 +94,7 @@ void Client::receive_response()
 {
 	cout << "[Receive response]" << endl;
 
-	// streambuf를 사용해 한 번에 읽기
+	// streambuf를 사용해 헤더, response 한 번에 읽기
 	shared_ptr<boost::asio::streambuf> buffer = make_shared<boost::asio::streambuf>();
 	async_read(_socket, *buffer, boost::asio::transfer_at_least(sizeof(PacketHeader)),
 		bind_executor(_strand,
@@ -103,74 +107,19 @@ void Client::receive_response()
 					shared_ptr<PacketHeader> header = make_shared<PacketHeader>();
 					std::memcpy(header.get(), raw_data, sizeof(PacketHeader));
 
-					cout << "Packet Type: " << header->type << ", Data Size: " << header->size << endl;
+					cout << "Packet Type: " << header->type << ", Data Size: " << header->size << ", Request ID: " << header->request_id << endl;
 
 					shared_ptr<string> response = make_shared<string>(raw_data + sizeof(PacketHeader), header->size); // response 데이터의 시작점으로 부터 header->size 만큼 response 읽기
+					buffer->consume(sizeof(PacketHeader) + header->size); // streambuf에서 데이터를 읽어왔으니 해당 데이터를 버퍼에서 제거
 
 					// 응답 출력
 					cout << "[Response]" << endl << *response << endl;
 
-					if (header->type == PACKET_CREATE)
+					auto it = _callbacks.find(header->request_id);
+					if (it != _callbacks.end())
 					{
-						// uid 저장을 위해 Util::setUID() 호출
-						cout << "PACKET_CREATE process call!" << endl;
-						Util::setUID(stoi(response->c_str()));
-						cout << "uid saved: " << Util::getUID() << endl;
-
-						return;
-					}
-
-					if (header->type == PACKET_CREATE_ERROR)
-					{
-						// 닉네임 입력 메뉴에서 닉네임을 다시 입력하도록 처리
-						cout << "PACKET_CREATE_ERROR process call!" << endl;
-						MenuCreateUserName* menuCreateUserName = dynamic_cast<MenuCreateUserName*>(MenuManager::getInstance().getMenu(MenuIndex::MAKE_USERNAME_MENU)); // 안전하게 다운캐스팅 (menuCreateUserName*이 아닐경우 nullptr 반환)
-						if (!menuCreateUserName)
-						{
-							cout << "menuCreateUserName is null!" << endl;
-						}
-						else
-						{
-							menuCreateUserName->setErrorText("Try with a different name.");
-						}
-
-						return;
-					}
-
-					if (header->type == PACKET_READ_RANKING)
-					{
-						cout << "PACKET_READ_RANKING process call!" << endl;
-						MenuRanking* menuRanking = dynamic_cast<MenuRanking*>(MenuManager::getInstance().getMenu(MenuIndex::RANKING_MENU)); // 안전하게 다운캐스팅 (해당 형식이 아닐경우 nullptr 반환)
-						if (!menuRanking)
-						{
-							cout << "menuRanking is null!" << endl;
-							return;
-						}
-
-						// 한줄씩 데이터를 읽어서 username, score 데이터를 parameter로 넘기기 
-						stringstream ss(*response);
-						string line;
-
-						while (getline(ss, line))
-						{
-							stringstream lineStream(line);
-							string name;
-							string score;
-
-							// space로 구분된 name, score 읽은 후 rankData에 삽입
-							if (lineStream >> name >> score)
-								menuRanking->pushRankData(name, score);
-						}
-
-						return;
-					}
-
-					if (header->type == PACKET_READ_MAX_CLEAR_STAGE)
-					{
-						cout << "PACKET_READ_STAGE process call!" << endl;
-						// uid에 해당하는 가장 높이 클리어했던 stage 저장
-						Game::getInstance().setPlayerCurrentClearStage(Game::getInstance().getUid(), stoi(response->c_str()));
-						return;
+						it->second(response->c_str()); // 응답 데이터 전달하며 콜백 실행
+						_callbacks.erase(it); // 완료 후 콜백 제거
 					}
 				}
 				else

@@ -287,7 +287,11 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 				+ to_string(_clearTime);
 
 			// DB에 게임 결과를 저장 (DB 저장 후 추가 작업은 없음, 메모리에는 이미 결과가 저장되어 있는 상태)
-			Game::getInstance().getClient()->send_packet_async(PACKET_WRITE, data);
+			Game::getInstance().getClient()->send_packet_async(PACKET_WRITE, data,
+				[](const string& response) { // 콜백 정의
+					return;
+				}
+			);
 		}
 			
 

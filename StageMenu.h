@@ -17,4 +17,6 @@ public:
 private:
     Font _font;
     vector<Text> stageTexts;
+    Text _returnPageText;
+    Text _loadingText;
 };

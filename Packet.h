@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 // 패킷 종류를 정의하는 열거형
 enum PacketType
@@ -18,5 +19,6 @@ struct PacketHeader
 {
 	PacketType type; // 패킷 종류
 	size_t size; // 패킷 바디의 크기
+	uint32_t request_id; // 요청 ID 추가
 };
 

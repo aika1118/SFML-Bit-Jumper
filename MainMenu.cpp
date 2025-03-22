@@ -52,7 +52,34 @@ void MainMenu::update(RenderWindow& window, const Event& event, float deltaTime,
             if (Game::getInstance().isServerConnected() == false) return; // offline 모드인 경우 랭킹 진입을 허용하지 않음
 
             nextState = MenuIndex::RANKING_MENU; // 랭킹 메뉴
-            Game::getInstance().getClient()->send_packet_async(PACKET_READ_RANKING, "");
+            Game::getInstance().getClient()->send_packet_async(PACKET_READ_RANKING, "",
+                [](const string& response) { // 콜백 정의
+                    cout << "PACKET_READ_RANKING callback!" << endl;
+                    MenuRanking* menuRanking = dynamic_cast<MenuRanking*>(MenuManager::getInstance().getMenu(MenuIndex::RANKING_MENU)); // 안전하게 다운캐스팅 (해당 형식이 아닐경우 nullptr 반환)
+                    if (!menuRanking)
+                    {
+                        cout << "menuRanking is null!" << endl;
+                        return;
+                    }
+
+                    // 한줄씩 데이터를 읽어서 username, score 데이터를 parameter로 넘기기 
+                    stringstream ss(response);
+                    string line;
+
+                    while (getline(ss, line))
+                    {
+                        stringstream lineStream(line);
+                        string name;
+                        string score;
+
+                        // space로 구분된 name, score 읽은 후 rankData에 삽입
+                        if (lineStream >> name >> score)
+                            menuRanking->pushRankData(name, score);
+                    }
+
+                    return;
+                }
+            );
         }
     }
 }

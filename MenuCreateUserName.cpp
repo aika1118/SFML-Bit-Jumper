@@ -87,7 +87,16 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
             cout << "submit success: " << _inputString << endl;
             // Server에 닉네임 저장 및 uid 발급을 위한 패킷전송
             if (Game::getInstance().isServerConnected())
-                Game::getInstance().getClient()->send_packet_async(PACKET_CREATE, _inputString);
+                Game::getInstance().getClient()->send_packet_async(PACKET_CREATE, _inputString,
+                    [](const string& response) { // 콜백 정의
+                        // uid 저장을 위해 Util::setUID() 호출
+                        cout << "PACKET_CREATE callback!" << endl;
+                        Util::setUID(stoi(response));
+                        cout << "uid saved: " << Util::getUID() << endl;
+
+                        return;
+                    }
+                );
 
 
             return;

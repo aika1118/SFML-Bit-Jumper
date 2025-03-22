@@ -40,7 +40,7 @@ void MenuRanking::init(RenderWindow& window)
     _returnPageText.setOrigin(_returnPageText.getLocalBounds().width / 2, _returnPageText.getLocalBounds().height / 2);
     _returnPageText.setPosition(100.f, (float)window.getSize().y - 50.f);
 
-    // 랭킹 데이터 불러오는 중 출력할 텍스트
+    // Loading... 텍스트
     _loadingText.setFont(_font);
     _loadingText.setFillColor(Color::White);
     _loadingText.setString("Loading...");
