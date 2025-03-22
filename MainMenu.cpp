@@ -17,13 +17,6 @@ void MainMenu::init(RenderWindow& window)
     _playText.setOrigin(_playText.getLocalBounds().width / 2, _playText.getLocalBounds().height / 2);
     _playText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 - 90);
 
-	// Exit
-	_exitText.setFont(_font);
-	_exitText.setFillColor(Color::White);
-	_exitText.setString("Exit");
-	_exitText.setCharacterSize(60);
-    _exitText.setOrigin(_exitText.getLocalBounds().width / 2, _exitText.getLocalBounds().height / 2);
-	_exitText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 30);
 
     // Ranking
     _rankingText.setFont(_font);
@@ -32,7 +25,15 @@ void MainMenu::init(RenderWindow& window)
     _rankingText.setString("Ranking");
     _rankingText.setCharacterSize(60);
     _rankingText.setOrigin(_rankingText.getLocalBounds().width / 2, _rankingText.getLocalBounds().height / 2);
-    _rankingText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 150);
+    _rankingText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 30);
+
+	// Exit
+	_exitText.setFont(_font);
+	_exitText.setFillColor(Color::White);
+	_exitText.setString("Exit");
+	_exitText.setCharacterSize(60);
+    _exitText.setOrigin(_exitText.getLocalBounds().width / 2, _exitText.getLocalBounds().height / 2);
+	_exitText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2 + 150);
 }
 
 void MainMenu::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)

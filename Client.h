@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <memory>
 #include "Packet.h"
 #include "Util.h"
 
@@ -11,7 +12,7 @@ using namespace std;
 using namespace boost::asio;
 using namespace boost::asio::ip;
 
-class Client
+class Client : public enable_shared_from_this<Client>
 {
 public:
 	Client(io_context& io_context, const string& host, const string& port); // 생성자: 서버에 연결
@@ -22,9 +23,15 @@ public:
 private:
 	tcp::socket _socket; // 서버와 통신할 소켓
 	//tcp::resolver _resolver; // 호스트와 포트를 resolve (DNS 조회를 통해 도메인 이름을 IP 주소로 resolve)
-	void receive_response(); // 서버로부터 응답을 받는 함수
 	io_context& _io_context; // 작업 큐 역할을 하며, 비동기 작업을 큐에 등록
 	executor_work_guard<io_context::executor_type> _work_guard; // io_context가 종료되지 않도록 유지
 	thread_pool _thread_pool; // io_context 실행을 위한 스레드 풀
 	thread _io_thread; // io_context 실행을 위한 스레드
+	strand<io_context::executor_type> _strand; // 소켓 접근 순차화 (동시에 하나의 소켓으로 async_write 요청 시 충돌 방지)
+	string _host;
+	string _port;
+
+	void reconnect(); // 소켓 재연결
+	void receive_response(); // 서버로부터 응답을 받는 함수
+	void process_response(shared_ptr<boost::asio::streambuf> buffer, const PacketHeader& header); // 응답받은 데이터 후처리
 };
