@@ -49,6 +49,16 @@ void Client::send_packet_async(PacketType type, const string& data, Callback cb 
 {
 	// strand를 통해 비동기 작업을 순차화
 	post(_strand, [this, type, data, cb]() {
+
+		// 현재 요청 처리중인 패킷에 대해 중복요청은 무시
+		if (Util::getPacketWaitStatus(type) == true)
+		{
+			cout << "Ignoring duplicate request for type: " << type << endl;
+			return;
+		}
+
+		Util::setPacketWaitStatus(type, true); // 패킷 요청에 대해 wait status 부여 (중복처리 방지, 로딩중 처리 등 위함)
+
 		uint32_t request_id = _request_counter++; // 패킷 요청에 대한 고유 ID 생성
 		if (cb) _callbacks[request_id] = cb; // 콜백 저장
 
@@ -94,7 +104,7 @@ void Client::receive_response()
 {
 	cout << "[Receive response]" << endl;
 
-	// streambuf를 사용해 헤더, response 한 번에 읽기
+	// streambuf를 사용해 헤더, 데이터 한 번에 읽기
 	shared_ptr<boost::asio::streambuf> buffer = make_shared<boost::asio::streambuf>();
 	async_read(_socket, *buffer, boost::asio::transfer_at_least(sizeof(PacketHeader)),
 		bind_executor(_strand,
@@ -121,6 +131,8 @@ void Client::receive_response()
 						it->second(response->c_str()); // 응답 데이터 전달하며 콜백 실행
 						_callbacks.erase(it); // 완료 후 콜백 제거
 					}
+
+					Util::setPacketWaitStatus(header->type, false); // 패킷 요청 콜백까지 호출 완료 후 wait status 해제
 				}
 				else
 				{

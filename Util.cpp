@@ -117,14 +117,14 @@ bool Util::checkServerConnection()
 	
 }
 
-bool Util::getPacketWaitStatus(int packet_id)
+bool Util::getPacketWaitStatus(PacketType packetType)
 {
-	return _PacketWaitStatus[packet_id];
+	return _PacketWaitStatus[packetType];
 }
 
-void Util::setPacketWaitStatus(int packet_id, bool status)
+void Util::setPacketWaitStatus(PacketType packetType, bool status)
 {
-	_PacketWaitStatus[packet_id] = status;
+	_PacketWaitStatus[packetType] = status;
 }
 
 

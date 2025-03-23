@@ -286,11 +286,9 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 				+ to_string(_judgementPercentage) + ","
 				+ to_string(_clearTime);
 
-			Util::setPacketWaitStatus(PACKET_WRITE, true); // PACKET_WRITE 패킷 요청에 대해 wait status 부여 (로딩중 상태 얻기 위함)
 			// DB에 게임 결과를 저장 (DB 저장 후 추가 작업은 없음, 메모리에는 이미 결과가 저장되어 있는 상태)
 			Game::getInstance().getClient()->send_packet_async(PACKET_WRITE, data,
 				[](const string& response) { // 콜백 정의
-					Util::setPacketWaitStatus(PACKET_WRITE, false); // PACKET_WRITE 패킷 요청에 대해 wait status 해제 (로딩중 상태 얻기 위함)
 					return;
 				}
 			);

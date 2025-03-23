@@ -23,8 +23,9 @@ public:
 	static string getUserName(int uid);
 
 	static bool checkServerConnection();
-	static bool getPacketWaitStatus(int packet_id);
-	static void setPacketWaitStatus(int packet_id, bool status);
+	static bool getPacketWaitStatus(PacketType packetType);
+	static void setPacketWaitStatus(PacketType packetType, bool status);
 
-	inline static vector<bool> _PacketWaitStatus = vector<bool>(PAKCET_TYPE_MAX_NUM, false); // 각 PACKET 요청에 대해 기다리고 있는지 상태를 저장하는 vector (1 = 기다리는중, 0 = 기다리지 않는중)
+	// inline static으로 헤더파일에서 선언과 동시에 초기화까지 진행
+	inline static unordered_map<PacketType, bool> _PacketWaitStatus; // 각 PACKET 요청에 대해 기다리고 있는지 상태를 저장 (1 = 기다리는중, 0 = 기다리지 않는중)
 };
