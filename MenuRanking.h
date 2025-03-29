@@ -5,6 +5,7 @@
 #include "Game.h"
 #include <vector>
 #include <iostream>
+#include <mutex>
 
 using namespace std;
 
@@ -31,4 +32,6 @@ private:
 	Text _loadingText;
 
 	vector<RankData> _rankData;
+
+	mutex rankData_mutex_; // rankData가 네트워크 쓰레드 콜백 함수에서 수정이 이루어지고 메인 쓰레드에서 읽기 작업이 있기 때문에 lock으로 보호 필요
 };

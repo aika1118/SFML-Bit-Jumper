@@ -22,6 +22,16 @@ Game::Game() // 참조자 멤버변수 초기화
 	}
 }
 
+int Game::getUid() const
+{
+	return _uid;
+}
+
+void Game::setUid(int uid)
+{
+	_uid = uid;
+}
+
 Game& Game::getInstance()
 {
 	static Game instance; // 인스턴스는 최초 호출 시에만 생성됨
@@ -78,7 +88,7 @@ void Game::Begin(RenderWindow& window)
 	MenuManager::getInstance().init(window);
 
 	// 서버연결 안되어있으면 진행 스테이지 상황을 기본값으로 초기화 (_uid는 이미 SETTING_UID_NOT_INITED 값으로 초기화되어있음)
-	if (_isServerConnected == false) setPlayerCurrentClearStage(_uid, PLAYER_DEFAULT_STAGE);
+	if (_isServerConnected == false) setPlayerCurrentClearStage(getUid(), PLAYER_DEFAULT_STAGE);
 
 	InitSkill();
 
@@ -147,11 +157,13 @@ void Game::setMenuState(int menuState)
 
 int Game::getPlayerCurrentClearStage(int id)
 {
+	lock_guard<mutex> lock(playerCurrentClearStages_mutex_);
 	return _playerCurrentClearStages[id];
 }
 
 void Game::setPlayerCurrentClearStage(int id, int stage)
 {
+	lock_guard<mutex> lock(playerCurrentClearStages_mutex_);
 	_playerCurrentClearStages[id] = stage;
 }
 
@@ -179,11 +191,6 @@ Client* Game::getClient()
 io_context& Game::getIoContext()
 {
 	return io_context;
-}
-
-int Game::getUid()
-{
-	return _uid;
 }
 
 string Game::getUsername()
@@ -224,7 +231,7 @@ void Game::Update(float deltaTime, RenderWindow& window)
 			_menuState = MenuIndex::MAIN_MENU; // 메인 메뉴로 이동
 
 			// uid에 해당하는 최신 clear stage를 아래 const 값으로 초기화 (실제 db값 받기전에 로딩중을 알리는 처리를 하기 위함 in StageMenu.cpp)
-			_playerCurrentClearStages[_uid] = SETTING_PLAYER_CURRENT_CLEAR_STAGE_NOT_INITED;
+			setPlayerCurrentClearStage(_uid, SETTING_PLAYER_CURRENT_CLEAR_STAGE_NOT_INITED);
 			
 			// uid에 해당하는 최신 clear stage 정보 받아오기
 			if (Game::getInstance().isServerConnected())

@@ -15,7 +15,7 @@ using namespace boost::asio::ip;
 class Client : public enable_shared_from_this<Client>
 {
 public:
-	using Callback = function<void(const string&)>;
+	using Callback = function<void(const string& response)>; // 콜백함수로 사용 (람다 표현식으로 호환가능)
 
 	Client(io_context& io_context, const string& host, const string& port); // 생성자: 서버에 연결
 	~Client();

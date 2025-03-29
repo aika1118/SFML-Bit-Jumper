@@ -72,7 +72,7 @@ void MenuCreateUserName::init(RenderWindow& window)
 void MenuCreateUserName::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)
 {
     // uid 생성 요청 보냈고 아직 서버에서 응답을 받지 못하였다면 로딩중 처리
-    if (_isUidCreateRequestSended && !_isUidCreated) return;
+    if (_isUidCreateRequestSended && !getIsUidCreated()) return;
         
     // inputBox 영역을 클릭한 경우 cursor 표시를 위한 cursorOn = true 처리
     if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left)
@@ -89,7 +89,7 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
         // submit 버튼을 누른 경우 submit 처리
         if (_submitBox.getGlobalBounds().contains(mousePos))
         {
-            if (_inputString.empty())
+            if (isInputStringEmpty())
 			{
 				cout << "cannot submit empty string" << endl; // 차후 인게임에서 확인할 수 있도록 변경 필요
 				return;
@@ -99,13 +99,17 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
             // Server에 닉네임 저장 및 uid 발급을 위한 패킷전송
             if (Game::getInstance().isServerConnected())
                 _isUidCreateRequestSended = true;
+
+                lock_guard<mutex> lock(inputString_mutex_); // 패킷 요청 보내는 쓰레드가 공유자원(inputString) 읽을 때 lock 적용
                 Game::getInstance().getClient()->send_packet_async(PACKET_CREATE, _inputString,
                     [this](const string& response) { // 콜백 정의
                         // uid 저장을 위해 Util::setUID() 호출
                         cout << "PACKET_CREATE callback!" << endl;
                         Util::setUID(stoi(response));
                         cout << "uid saved: " << Util::getUID() << endl;
-                        _isUidCreated = true;
+
+                        setIsUidCreated(true);
+
                         return;
                     }
                 );
@@ -125,6 +129,7 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
         // 백스페이스 처리
         if (event.text.unicode == 8) 
         {
+            lock_guard<mutex> lock(inputString_mutex_);
             if (_inputString.empty()) return;
 
             _inputString.pop_back();
@@ -136,11 +141,12 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
         if (event.text.unicode == 32) return;
 
         // 일반 문자 입력 (6글자 제한)
+        lock_guard<mutex> lock(inputString_mutex_);
         if (event.text.unicode < 128 && _inputString.size() < SETTING_USERNAME_MAX_LENGTH)
 		{
             // _errorText 초기화
             _errorText.setString("");
-
+           
 			_inputString += (char)event.text.unicode;
 			_inputText.setString(_inputString);
             return;
@@ -150,7 +156,7 @@ void MenuCreateUserName::update(RenderWindow& window, const Event& event, float 
 
 void MenuCreateUserName::render(Renderer& renderer)
 {
-    if (_isUidCreateRequestSended && !_isUidCreated) // uid 생성 요청 보냈고 아직 서버에서 응답을 받지 못하였다면 로딩중처리
+    if (_isUidCreateRequestSended && !getIsUidCreated()) // uid 생성 요청 보냈고 아직 서버에서 응답을 받지 못하였다면 로딩중처리
     {
         renderer._target.draw(_loadingText);
         return;
@@ -172,4 +178,22 @@ void MenuCreateUserName::render(Renderer& renderer)
 void MenuCreateUserName::setErrorText(string text)
 {
     _errorText.setString(text);
+}
+
+bool MenuCreateUserName::isInputStringEmpty()
+{
+    lock_guard<mutex> lock(inputString_mutex_);
+    return _inputString.empty();
+}
+
+bool MenuCreateUserName::getIsUidCreated() const
+{
+    lock_guard<mutex> lock(isUidCreated_mutex_);
+    return _isUidCreated;
+}
+
+void MenuCreateUserName::setIsUidCreated(bool status)
+{
+    lock_guard<mutex> lock(isUidCreated_mutex_);
+    _isUidCreated = status;
 }

@@ -17,6 +17,7 @@
 #include "Client.h"
 #include <boost/asio.hpp>
 #include <thread>
+#include <mutex>
 
 using namespace sf;
 using namespace std;
@@ -65,7 +66,9 @@ public:
 	Client* getClient();
 	io_context& getIoContext();
 
-	int getUid();
+	int getUid() const;
+	void setUid(int uid);
+
 	string getUsername();
 
 
@@ -98,9 +101,11 @@ private:
 	Client* client = nullptr; // Client 객체 참조
 	io_context io_context;
 
-	int _uid = SETTING_UID_NOT_INITED; // 유저 고유 UID
+	int _uid = SETTING_UID_NOT_INITED; // 유저 고유 UID 
 	string _username; // 유저 이름 (uid로 플레이어를 구분하고 있기 때문에 username은 다른 유저와 중복되도 상관없음)
 
 	bool _isUidInited = false; // _uid를 초기화 했는지 저장
 	bool _isServerConnected = true;
+
+	mutex playerCurrentClearStages_mutex_; // _playerCurrentClearStages 자원은 네트워크 쓰레드가 콜백 함수에서 수정을 진행하고 메인 쓰레드에서 읽기 등 작업이 있기 때문에 lock으로 보호
 };

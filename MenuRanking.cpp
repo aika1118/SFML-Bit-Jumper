@@ -48,19 +48,6 @@ void MenuRanking::init(RenderWindow& window)
     _loadingText.setOrigin(_loadingText.getLocalBounds().width / 2, _loadingText.getLocalBounds().height / 2);
     _loadingText.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
 
-    /* 테스트용
-    _rankData.push_back({"a", 100});
-    _rankData.push_back({"b", 90});
-    _rankData.push_back({"c", 80});
-    _rankData.push_back({"d", 70});
-    _rankData.push_back({"e", 60});
-    _rankData.push_back({"f", 50});
-    _rankData.push_back({"g", 40});
-    _rankData.push_back({"h", 30});
-    _rankData.push_back({"i", 20});
-    _rankData.push_back({"j", 10});
-    */
-
 }
 
 void MenuRanking::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)
@@ -76,11 +63,14 @@ void MenuRanking::update(RenderWindow& window, const Event& event, float deltaTi
             return;
         }
 
-        // 다음 페이지로 이동 (남은 랭킹 데이터가 있는 경우)
-        if (_nextPageText.getGlobalBounds().contains(mousePos) && (_currentPage + 1) * MENU_RANKING_PER_PAGE < _rankData.size()) 
         {
-            _currentPage++; 
-            return;
+            lock_guard<mutex> lock(rankData_mutex_);
+            // 다음 페이지로 이동 (남은 랭킹 데이터가 있는 경우)
+            if (_nextPageText.getGlobalBounds().contains(mousePos) && (_currentPage + 1) * MENU_RANKING_PER_PAGE < _rankData.size()) 
+            {
+                _currentPage++; 
+                return;
+            }
         }
 
         // 이전 메뉴로 이동
@@ -99,6 +89,8 @@ void MenuRanking::render(Renderer& renderer)
     renderer._target.draw(_prevPageText);
     renderer._target.draw(_nextPageText);
     renderer._target.draw(_returnPageText);
+
+    lock_guard<mutex> lock(rankData_mutex_);
 
     // 랭킹 데이터가 아직 비어있는 경우 (서버에서 아직 데이터를 불러오는 중이라면)
     if (_rankData.size() == 0)
@@ -126,6 +118,7 @@ void MenuRanking::render(Renderer& renderer)
 
 void MenuRanking::pushRankData(string name, string score)
 {
+    lock_guard<mutex> lock(rankData_mutex_);
     _rankData.push_back({name, score});
     return;
 }
@@ -133,6 +126,7 @@ void MenuRanking::pushRankData(string name, string score)
 void MenuRanking::initRankData()
 {
     cout << "initRankData() Called !" << endl;
+    lock_guard<mutex> lock(rankData_mutex_);
     _rankData.clear();
     return;
 }
