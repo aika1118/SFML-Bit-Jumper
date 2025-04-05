@@ -3,5 +3,5 @@
 
 void Object::destroyBody()
 {	
-	Physics::bodiesToDestroy.push_back(_body);
+	Physics::bodiesToDestroy.insert(_body);
 }

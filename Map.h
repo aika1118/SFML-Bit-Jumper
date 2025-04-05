@@ -33,10 +33,14 @@ public:
 
 	string getMapImages(int stage);
 
+	unordered_map<string, vector<b2Body*>> bodies; // b2body 종류와 실제 body들을 저장하는 자료구조 (데이터 보호를 위해 private으로 뺴야하지 않을까?), 현재 lock 블록만 처리중 (나머지도 추가필요)
+	unordered_map<string, vector<pair<int, int>>> textures; // texture 종류와 해당 위치를 저장하는 자료구조, 현재 lock 블록만 처리중 (나머지도 추가필요)
+
 private:
 	Map(); // 외부에서 생성자 호출 불가하도록 설정
 	Map(const Map&) = delete; // 복사생성자 삭제
 	Map& operator=(const Map&) = delete; // 대입연산자 삭제
 	
 	unordered_map<int, string> mapImages;
+	
 };

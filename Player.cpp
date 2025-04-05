@@ -172,6 +172,25 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 
 		++_coins;
 
+		// 일정 코인을 모은 경우 lock 블록 해제
+		if (_coins == BLOCK_COIN_REQUIRED_TO_OPEN)
+		{
+			// lock 블록 body 제거
+			for (b2Body* body : Map::getInstance().bodies["lock"])
+			{
+				if (!body) continue;
+
+				Physics::bodiesToDestroy.insert(body);
+			}
+			
+			// lock 블록 texture 제거
+			for (pair<int, int> pos : Map::getInstance().textures["lock"])
+			{
+				Map::getInstance()._grid[pos.first][pos.second] = nullptr; // lock 블록에 있던 texture를 nullptr로 교체
+			}
+			Map::getInstance().textures["lock"].clear();
+		}
+
 
 		return;
 	}

@@ -2,12 +2,14 @@
 
 b2World* Physics::world; // static 정의
 b2Draw* Physics::debugDraw; // static 정의
-vector<b2Body*> Physics::bodiesToDestroy; // static 정의
+set<b2Body*> Physics::bodiesToDestroy; // static 정의
 
 void Physics::Init()
 {
 	if (world)
 		delete world; // 기존 world 초기화 (b2Body 관련 리소스도 안전하게 정리)
+
+	bodiesToDestroy.clear();
 
 	world = new b2World(b2Vec2(WORLD_GRAVITY_X, WORLD_GRAVITY_Y));
 	world->SetDebugDraw(debugDraw);
@@ -24,6 +26,7 @@ void Physics::Update(float deltaTime)
 	for (b2Body* body : bodiesToDestroy) 
 	{
 		// body->GetUserData().pointer 에 동적할당된 객체도 delete 해줘야 하지 않을까? (스마트 포인터 고려)
+		if (!body) continue;
 		Physics::world->DestroyBody(body);
 	}
 

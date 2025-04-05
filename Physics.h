@@ -8,6 +8,7 @@
 #include "Config.h"
 #include "MyDebugDraw.h"
 #include "MyGlobalContactListener.h"
+#include "set"
 
 using namespace std;
 
@@ -24,5 +25,5 @@ public:
 	static b2World* world; // 물리적 객체들이 존재하는 공간
 	static b2Draw* debugDraw; // 디버그 드로잉 용
 
-	static vector<b2Body*> bodiesToDestroy; // 삭제 대기 리스트
+	static set<b2Body*> bodiesToDestroy; // 삭제 대기 리스트 (중복자료가 있으면 안되니 set 사용)
 };

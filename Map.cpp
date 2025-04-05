@@ -6,6 +6,7 @@ string Map::getMapImages(int stage)
 	return mapImages[stage];
 }
 
+
 Map::Map()
 {
     for (int i = MapType::STAGE_1; i < MapType::END_OF_MAP_INDEX; ++i)
@@ -26,6 +27,8 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
     _grid = vector<vector<Texture*>>(image.getSize().x, vector<Texture*>(image.getSize().y, nullptr));
 
     objects.clear();
+    bodies.clear();
+    textures.clear();
 
     Vector2f playerPosition;
 
@@ -62,7 +65,10 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
             else if (color == Color(200, 200, 200))
 				_grid[x][y] = &Resources::_textures["exit.png"];
             else if (color == Color(215, 123, 186)) // N개 코인을 먹으면 열리는 블록
+            { 
                 _grid[x][y] = &Resources::_textures["lock.png"];
+                textures["lock"].push_back({x, y});
+            }
 
             else
                 continue;
@@ -74,6 +80,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 continue;
             }
 
+            // 아래 코드가 비슷한데 모듈화 시킬 수 있지 않을까?
             if (_grid[x][y] == &Resources::_textures["block.png"])
             {
                 b2BodyDef bodyDef; // 타일의 물리적 몸체 정의
@@ -132,6 +139,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 continue;
             }
 
+            // 출구 블록인 경우
             if (_grid[x][y] == &Resources::_textures["exit.png"])
             {
 				b2BodyDef bodyDef; // 타일의 물리적 몸체 정의
@@ -156,6 +164,40 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 continue;
             }
             
+            // 잠김 블록인 경우
+            if (_grid[x][y] == &Resources::_textures["lock.png"])
+            {
+                b2BodyDef bodyDef; // 타일의 물리적 몸체 정의
+                bodyDef.position.Set(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f);
+                b2Body* body = Physics::world->CreateBody(&bodyDef); // body = 새로 생성된 몸체에 대해 포인터로 참조가능
+
+                // Ghost Collision 회피를 위한 chainShape 사용 (타일 경계 부근에서 캐릭터가 끼이는 현상 방지)
+                // 타일모양대로 사각형 충돌체 그리기 (0 ~ 4 순서대로 이어지니 이점 유의)
+                vector<b2Vec2> vs(4);
+                vs[0].Set(-_cellSize / 2.f, -_cellSize / 2.f);
+                vs[1].Set(+_cellSize / 2.f, -_cellSize / 2.f);
+                vs[2].Set(+_cellSize / 2.f, +_cellSize / 2.f);
+                vs[3].Set(-_cellSize / 2.f, +_cellSize / 2.f);
+
+                b2ChainShape chain;
+                chain.CreateLoop(&vs[0], 4);
+
+                FixtureData* fixtureData = new FixtureData(); // FixtureData를 객체 안에 두고 unique_ptr로 객체 소멸 관리해야할듯 함
+                fixtureData->type = FixtureDataType::LockTile;
+                fixtureData->mapX = x;
+                fixtureData->mapY = y;
+                fixtureData->canJump = true;
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.userData.pointer = (uintptr_t)fixtureData;
+                fixtureDef.density = 0.f;
+                fixtureDef.shape = &chain;
+                body->CreateFixture(&fixtureDef);
+
+                bodies["lock"].push_back(body);
+
+                continue;
+            }
         }
     }
 
@@ -176,7 +218,8 @@ void Map::Draw(Renderer& renderer)
     {
         int y = 0;
         for (const Texture* cell : cells)
-        {
+        {   
+
             if (cell)
                 renderer.Draw(*cell, Vector2f(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f), Vector2f(_cellSize, _cellSize));
 

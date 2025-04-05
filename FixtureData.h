@@ -17,6 +17,7 @@ enum class FixtureDataType
 	MapTile,
 	SaveTile,
 	ExitTile,
+	LockTile,
 	Object,
 	Attack
 };

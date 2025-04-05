@@ -30,7 +30,7 @@ bool Skill::isSkillEnd()
 {
     if (_timer >= _skillTime) // 정해진 스킬시간을 모두 소모한 경우 스킬이 종료된 것으로 판정
     {
-        Physics::bodiesToDestroy.push_back(_attackBody); // attack box 제거
+        Physics::bodiesToDestroy.insert(_attackBody); // attack box 제거
         return true;
     }
 
