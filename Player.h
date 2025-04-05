@@ -47,6 +47,7 @@ public:
 	float getJudgementPercentage();
 	string getJudgementCurrent();
 	int getCurrentClearStage();
+	int getCoin();
 
 private:
 	void HandleMove(float deltaTime, b2Vec2& velocity);

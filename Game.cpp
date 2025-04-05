@@ -81,6 +81,12 @@ void Game::Begin(RenderWindow& window)
 	gameOverText.setOutlineThickness(1.f);
 	gameOverText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
 
+	playerCoinText.setFont(font);
+	playerCoinText.setFillColor(Color::White);
+	playerCoinText.setOutlineColor(Color::Black);
+	playerCoinText.setOutlineThickness(1.f);
+	playerCoinText.setScale(UI_CHARACTER_SCALE/1.2f, UI_CHARACTER_SCALE/1.2f);
+
 	backgroundWhenPaused.setSize(Vector2f(1.f, 1.f));
 	backgroundWhenPaused.setFillColor(Color(0, 0, 0, 150)); // 알파값만 조정
 	backgroundWhenPaused.setOrigin(0.5f, 0.5f); // origin을 중심으로 맞추기
@@ -313,13 +319,20 @@ void Game::RenderUI(Renderer& renderer)
 
 	renderer._target.setView(camera.getUIView());
 
+	// 판정 퍼센트 렌더링
 	playerJudgementPercentageText.setPosition(-camera.getViewSize() / 2.f + Vector2f(2.f, 1.f)); // view 중심 (0, 0)으로부터 계산되는 position, 왼쪽 위로 설정됨
 	playerJudgementPercentageText.setString("Judgement: " + Util::floatToString(player.getJudgementPercentage(), 2) + "%");
 	renderer._target.draw(playerJudgementPercentageText);
 
+	// 판정등급 렌더링
 	playerJudgementText.setPosition(-camera.getViewSize() / 2.f + Vector2f(2.f, 5.f));
 	playerJudgementText.setString(player.getJudgementCurrent());
 	renderer._target.draw(playerJudgementText);
+
+	// 코인 획득 수 렌더링
+	playerCoinText.setPosition(Vector2f(camera.getViewSize().x / 2.f, -camera.getViewSize().y / 2.f) + Vector2f(-13.f, 1.f));
+	playerCoinText.setString("Coin: " + to_string(Game::getInstance().getPlayer().getCoin()));
+	renderer._target.draw(playerCoinText);
 
 	// 게임 일시정지 되었을 때 배경화면 지정
 	if (player._isDead)

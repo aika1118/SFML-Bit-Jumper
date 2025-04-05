@@ -172,7 +172,6 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 
 		++_coins;
 
-		//cout << "coins = " << _coins << endl;
 
 		return;
 	}
@@ -278,6 +277,10 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		Game::getInstance().setPlayerCurrentClearStage(Game::getInstance().getUid(), _currentClearStage);
 		Game::getInstance().setPlayerStageScore(Game::getInstance().getUid(), _currentClearStage, _judgementPercentage);
 
+		// 플레이어 savePosition 초기화 (게임이 완전 종료처리 되었기 때문)
+		Game::getInstance()._savePositionX = PLAYER_NO_SAVE_POSITION;
+		Game::getInstance()._savePositionY = PLAYER_NO_SAVE_POSITION;
+
 		if (Game::getInstance().isServerConnected())
 		{
 			// 서버에 id, 스테이지, 점수, 시간 정보를 패킷으로 전달
@@ -293,10 +296,11 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 				}
 			);
 		}
-			
+		
 
 		// state를 게임 종료 메뉴로 설정
 		Game::getInstance().setMenuState(MenuIndex::CLEAR_MENU);
+		
 
 		return;
 	}
@@ -330,6 +334,11 @@ string Player::getJudgementCurrent()
 int Player::getCurrentClearStage()
 {
 	return _currentClearStage;
+}
+
+int Player::getCoin()
+{
+	return _coins;
 }
 
 void Player::HandleMove(float deltaTime, b2Vec2& velocity)

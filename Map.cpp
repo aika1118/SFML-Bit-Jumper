@@ -61,6 +61,8 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 object = new BoxFragile();
             else if (color == Color(200, 200, 200))
 				_grid[x][y] = &Resources::_textures["exit.png"];
+            else if (color == Color(215, 123, 186)) // N개 코인을 먹으면 열리는 블록
+                _grid[x][y] = &Resources::_textures["lock.png"];
 
             else
                 continue;
@@ -159,12 +161,12 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 
     int saveX = Game::getInstance()._savePositionX;
     int saveY = Game::getInstance()._savePositionY;
-    // 세이브 포인트가 존재하는 경우
-    if (saveX || saveY)
-    {
-        Game::getInstance()._playerPosition = Vector2f(_cellSize * saveX + _cellSize / 2.f, _cellSize * saveY + _cellSize / 2.f);
-        _grid[saveX][saveY] = &Resources::_textures["save_used.png"];
-    }
+
+    // 세이브 정보가 없는 경우 return
+    if (saveX == PLAYER_NO_SAVE_POSITION && saveY == PLAYER_NO_SAVE_POSITION) return;
+
+    Game::getInstance()._playerPosition = Vector2f(_cellSize * saveX + _cellSize / 2.f, _cellSize * saveY + _cellSize / 2.f);
+    _grid[saveX][saveY] = &Resources::_textures["save_used.png"];
 }
 
 void Map::Draw(Renderer& renderer)

@@ -41,8 +41,8 @@ public:
 	void InitObject(); // // object 관리하는 모든 것들 초기화
 
 	Vector2f _playerPosition;
-	int _savePositionX = 0;
-	int _savePositionY = 0;
+	int _savePositionX = PLAYER_NO_SAVE_POSITION;
+	int _savePositionY = PLAYER_NO_SAVE_POSITION;
 
 	void InitSkill();
 
@@ -86,6 +86,7 @@ private:
 	Font font;
 	Text playerJudgementPercentageText;
 	Text playerJudgementText;
+	Text playerCoinText;
 	Text gameOverText;
 
 	RectangleShape backgroundWhenPaused; // 일시정지할 때의 배경
