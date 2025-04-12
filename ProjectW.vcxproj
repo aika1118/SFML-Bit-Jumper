@@ -156,6 +156,7 @@
     <ClCompile Include="MenuCreateUserName.cpp" />
     <ClCompile Include="MenuManager.cpp" />
     <ClCompile Include="MenuRanking.cpp" />
+    <ClCompile Include="Mushroom.cpp" />
     <ClCompile Include="SkillMeleeAttack.cpp" />
     <ClCompile Include="MyDebugDraw.cpp" />
     <ClCompile Include="MyGlobalContactListener.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="MenuCreateUserName.h" />
     <ClInclude Include="MenuManager.h" />
     <ClInclude Include="MenuRanking.h" />
+    <ClInclude Include="Mushroom.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="SkillMeleeAttack.h" />
     <ClInclude Include="MyDebugDraw.h" />

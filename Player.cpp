@@ -323,6 +323,21 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 
 		return;
 	}
+
+	// player가 버섯을 먹은경우 일정시간 점프력 상승
+	if (selfData->type == FixtureDataType::Player && otherData->type == FixtureDataType::Object && otherData->object->_tag == "mushroom")
+	{	
+		Mushroom* mushroom = dynamic_cast<Mushroom*>(otherData->object); // 안전하게 다운 캐스팅 (otherData->object가 Mushroom*이 아닐경우 nullptr 반환)
+		if (!mushroom) return;
+		if (bIsJumpImproved == true) return; // 이미 점프 상승 효과를 받는 중이라면 return 처리
+
+		// 별도로 버섯 object를 파괴하지 않고 Mushroom 클래스에서 렌더링만 되지 않도록 처리됨
+		bIsJumpImproved = true;
+		
+
+		cout << "jump improve on" << endl;
+	}
+
 }
 
 void Player::OnEndContact(b2Fixture* self, b2Fixture* other)
@@ -411,6 +426,7 @@ void Player::HandleJump(b2Vec2& velocity)
 		if (_groundContactCount > 0) // 최초 땅에서 점프하는 순간
 		{
 			velocity.y = PLAYER_JUMP_VELOCITY;
+			if (bIsJumpImproved == true) velocity.y *= sqrt(PLAYER_JUMP_IMPROVEMENT_SIZE); // 점프 상승효과 받을 때 높이가 PLAYER_JUMP_IMPROVEMENT_SIZE 배수만큼 증가
 			_isJumping = true;
 			_isFirstGrounded = false;
 			//cout << "Jump Success (Init) !" << endl;

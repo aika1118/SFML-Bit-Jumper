@@ -49,6 +49,8 @@ public:
 	int getCurrentClearStage();
 	int getCoin();
 
+	bool bIsJumpImproved = false;
+
 private:
 	void HandleMove(float deltaTime, b2Vec2& velocity);
 	void HandleJump(b2Vec2& velocity);

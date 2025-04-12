@@ -64,10 +64,14 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 object = new BoxFragile();
             else if (color == Color(200, 200, 200))
 				_grid[x][y] = &Resources::_textures["exit.png"];
-            else if (color == Color(215, 123, 186)) // N개 코인을 먹으면 열리는 블록
+            else if (color == Color(215, 123, 186)) // N개 코인을 먹으면 열리는 블록 (lock은 사라질 수 있는 블록인데 object처럼 관리해야하지 않을까?)
             { 
                 _grid[x][y] = &Resources::_textures["lock.png"];
                 textures["lock"].push_back({x, y});
+            }
+            else if (color == Color(118, 66, 138)) // 먹으면 점프력이 일정시간 높아지는 버섯
+            {
+				object = new Mushroom();
             }
 
             else

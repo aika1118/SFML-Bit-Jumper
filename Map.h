@@ -15,6 +15,7 @@
 #include "Enemy.h"
 #include "Spike.h"
 #include "BoxFragile.h"
+#include "Mushroom.h"
 
 
 using namespace sf;
