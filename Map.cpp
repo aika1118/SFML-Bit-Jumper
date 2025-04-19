@@ -55,7 +55,14 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 object = new Coin();
 
             else if (color == Color::Blue)
-                object = new Enemy();
+            {
+                // enemy를 pool에서 관리
+                Enemy* enemy = Game::getInstance().GetEnemyPool()->GetAvailableEnemy(Vector2f(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f));
+                if (!enemy)
+                {
+                    cerr << "Failed to spawn enemy at " << _cellSize * x + _cellSize / 2.f << ", " << _cellSize * y + _cellSize / 2.f << endl;
+                }
+            }
             else if (color == Color::Green)
                 _grid[x][y] = &Resources::_textures["save.png"];
             else if (color == Color(0, 255, 255))

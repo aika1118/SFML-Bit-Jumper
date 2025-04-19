@@ -26,4 +26,5 @@ public:
 	static b2Draw* debugDraw; // 디버그 드로잉 용
 
 	static set<b2Body*> bodiesToDestroy; // 삭제 대기 리스트 (중복자료가 있으면 안되니 set 사용)
+	static set<pair<b2Body*, bool>> bodiesSetEnabled; // body에 대해 SetEnable 처리할 목록 (삭제하지 않고 비활성화 상태로 만듦, pool에서 활용)
 };

@@ -3,6 +3,7 @@
 b2World* Physics::world; // static 정의
 b2Draw* Physics::debugDraw; // static 정의
 set<b2Body*> Physics::bodiesToDestroy; // static 정의
+set<pair<b2Body*, bool>> Physics::bodiesSetEnabled;
 
 void Physics::Init()
 {
@@ -10,6 +11,7 @@ void Physics::Init()
 		delete world; // 기존 world 초기화 (b2Body 관련 리소스도 안전하게 정리)
 
 	bodiesToDestroy.clear();
+	bodiesSetEnabled.clear();
 
 	world = new b2World(b2Vec2(WORLD_GRAVITY_X, WORLD_GRAVITY_Y));
 	world->SetDebugDraw(debugDraw);
@@ -29,8 +31,15 @@ void Physics::Update(float deltaTime)
 		if (!body) continue;
 		Physics::world->DestroyBody(body);
 	}
-
 	bodiesToDestroy.clear();
+
+	for (pair<b2Body*, bool> bodyInfo : bodiesSetEnabled)
+	{
+		if (!bodyInfo.first) continue;
+		bodyInfo.first->SetEnabled(bodyInfo.second);
+	}
+
+	bodiesSetEnabled.clear();
 }
 
 void Physics::DebugDraw(Renderer& renderer)

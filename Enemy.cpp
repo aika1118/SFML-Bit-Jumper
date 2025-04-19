@@ -7,6 +7,10 @@ void Enemy::Begin()
 	_isDead = false;
 	_destroyTimer = 0.f;
 	_facingLeft = false;
+	_isActive = false;
+	_hp = 2;
+	_hitTimer = 0.f;
+	_isEnemyAttacked = false;
 
 	_animation = Animation(0.45f,
 		{
@@ -18,6 +22,12 @@ void Enemy::Begin()
 
 	_fixtureData.object = this;
 	_fixtureData.type = FixtureDataType::Object;
+
+	// 기존 _body는 Physics::Init()에서 초기화됨
+
+	if (!Physics::world) return;
+	
+	// 현재 world에 맞게 새로운 _body 생성
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody; // 물리적 힘에 의해 움직이는 물체
@@ -35,18 +45,16 @@ void Enemy::Begin()
 	fixtureDef.friction = 0.f;
 	_body->CreateFixture(&fixtureDef);
 
-	_hp = 2;
-	_hitTimer = 0.f;
-	_isEnemyAttacked = false;
 }
 
 void Enemy::Update(float deltaTime)
 {
+	if (!_isActive) return;
+
 	if (_isDead)
 	{
 		_destroyTimer += deltaTime;
-		if (_destroyTimer >= ENEMY_DESTROY_TIME)
-			Game::getInstance().DeleteObject(this); // 더이상 렌더링 되지 않도록 삭제 (물리적 몸체는 적이 죽을 때 바로 이미 제거됨)
+		if (_destroyTimer >= ENEMY_DESTROY_TIME) _isActive = false;
 
 		return;
 	}
@@ -87,6 +95,7 @@ void Enemy::Update(float deltaTime)
 
 void Enemy::Render(Renderer& renderer)
 {
+	if (!_isActive) return;
 	// _isEnemyAttacked = true 일 때 적 피격 animation 별도 구축 필요
 
 	// _facingLeft : 캐릭터 속도 방향에 따라 x축 렌더링 방향 결정
@@ -98,15 +107,52 @@ void Enemy::Render(Renderer& renderer)
 	);
 }
 
-void Enemy::destroyBody()
-{
-	Object::destroyBody(); // 부모 함수 호출
-	_isDead = true;
-}
-
 bool Enemy::IsDead()
 {
 	return _isDead;
+}
+
+void Enemy::SetActive(bool active)
+{
+	if (!_body) return;
+
+	_isActive = active;
+	Physics::bodiesSetEnabled.insert({_body, active});
+}
+
+bool Enemy::IsActive() const
+{
+	return _isActive;
+}
+
+void Enemy::Reset(Vector2f position)
+{
+	_spawnPosition = position;
+	_position = position;
+	_isDead = false;
+	_destroyTimer = 0.f;
+	_hp = 2;
+	_hitTimer = 0.f;
+	_isEnemyAttacked = false;
+	_movement = ENEMY_MOVE_VELOCITY;
+	_facingLeft = false;
+	
+	_body->SetTransform(b2Vec2(position.x, position.y), 0.f);
+	_body->SetLinearVelocity(b2Vec2(0.f, 0.f));
+	Physics::bodiesSetEnabled.insert({ _body, true });
+}
+
+Vector2f Enemy::GetSpawnPosition() const
+{
+	return _spawnPosition;
+}
+
+void Enemy::SetDead()
+{
+	_isDead = true;
+	//_isActive = false;
+	Physics::bodiesSetEnabled.insert({ _body, false });
+	Game::getInstance().GetEnemyPool()->ScheduleEnemy(this, ENEMY_RESPAWN_TIME); // N초 뒤 리스폰 설정
 }
 
 

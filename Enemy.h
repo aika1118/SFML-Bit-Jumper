@@ -19,8 +19,12 @@ public:
 	virtual void Update(float deltaTime) override;
 	virtual void Render(Renderer& renderer) override;
 
-	virtual void destroyBody() override;
 	bool IsDead();
+	void SetActive(bool);
+	bool IsActive() const;
+	void Reset(Vector2f position);
+	Vector2f GetSpawnPosition() const;
+	void SetDead();
 
 	int _hp;
 	bool _isEnemyAttacked; // 피격 상태인지 체크
@@ -32,6 +36,8 @@ private:
 	float _destroyTimer; // 죽은 후 얼마나 texture를 노출시킬지 관리하는 변수
 	bool _facingLeft;
 	FixtureData _fixtureData;
+	bool _isActive;
+	Vector2f _spawnPosition;
 
 	float _hitTimer; // 피격 후 몬스터가 멈춰있는 시간 관리
 	

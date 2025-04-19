@@ -20,6 +20,9 @@ Game::Game() // 참조자 멤버변수 초기화
 	{
 		cerr << "Exception: " << e.what() << "\n"; // 예외처리
 	}
+
+	Physics::Init();
+	_enemyPool = new EnemyPool();
 }
 
 int Game::getUid() const
@@ -204,10 +207,17 @@ string Game::getUsername()
 	return _username;
 }
 
-void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정리 필요
+EnemyPool* Game::GetEnemyPool()
 {
+	return _enemyPool;
+}
+
+void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정리 필요 (world도 Game 생성자에서 Init하고 Restart()에서 또 Init 되는듯 하여 문제 없을지 확인)
+{
+	cout << "Restart() Called !" << endl;
 	InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)
 	Physics::Init(); // 기존 world 초기화
+	_enemyPool->Reset(); // enemyPool 초기화
 
 	player = Player(); // 임시 객체를 생성하고, 복사 대입 연산자로 새로 초기화
 	gameMap.CreateFromImage(_mapImage, _objects); // map 따라 player 위치 및 object 생성
@@ -282,6 +292,7 @@ void Game::Update(float deltaTime, RenderWindow& window)
 
 	Physics::Update(deltaTime);
 	player.Update(deltaTime);
+	_enemyPool->Update(deltaTime);
 	for (Object* object : _objects)
 		object->Update(deltaTime);
 
@@ -305,6 +316,7 @@ void Game::Render(Renderer& renderer)
 	renderer.Draw(Resources::_textures["sky.png"], Vector2f(backGroundPositionX, backGroundPositionY), Vector2f(_mapBound.width, _mapBound.height)); // 배경화면 그리기
 	gameMap.Draw(renderer);
 	player.Draw(renderer);
+	_enemyPool->Render(renderer);
 
 	for (Object* object : _objects)
 		object->Render(renderer);
@@ -375,6 +387,7 @@ void Game::InitObject()
 	// object 관리하는 모든 것들 초기화
 
 	Physics::bodiesToDestroy.clear();
+	Physics::bodiesSetEnabled.clear();
 
 	for (Object* object : _objects)
 		delete object;

@@ -18,6 +18,7 @@
 #include <boost/asio.hpp>
 #include <thread>
 #include <mutex>
+#include "EnemyPool.h"
 
 using namespace sf;
 using namespace std;
@@ -70,6 +71,7 @@ public:
 	void setUid(int uid);
 
 	string getUsername();
+	EnemyPool* GetEnemyPool();
 
 
 private:
@@ -109,4 +111,5 @@ private:
 	bool _isServerConnected = true;
 
 	mutex playerCurrentClearStages_mutex_; // _playerCurrentClearStages 자원은 네트워크 쓰레드가 콜백 함수에서 수정을 진행하고 메인 쓰레드에서 읽기 등 작업이 있기 때문에 lock으로 보호
+	EnemyPool* _enemyPool = nullptr;
 };

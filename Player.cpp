@@ -228,14 +228,14 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 			enemy->_isEnemyAttacked = true;
 
 			if (enemy->_hp <= 0)
-				enemy->destroyBody(); // Physics::bodiesToDestroy.push_back()랑 같은 역할
+				enemy->SetDead(); // Physics::bodiesToDestroy.push_back()랑 같은 역할
 		}
 
 		// Player가 발 밑 센서로 적과 충돌한 경우 적 처치 처리 (적을 밟으면 죽일 수 있음)
 		if (selfData->type == FixtureDataType::PlayerSensor) 
 		{
 			cout << "Enemy Killed!" << endl;
-			enemy->destroyBody();
+			enemy->SetDead();
 			return;
 		}
 
