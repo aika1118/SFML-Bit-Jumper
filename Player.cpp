@@ -28,12 +28,14 @@ void Player::Begin()
 	bodyDef.fixedRotation = true; // 물체가 회전하지 않도록 설정
 	body = Physics::world->CreateBody(&bodyDef); // body = 새로 생성된 몸체에 대해 포인터로 참조가능
 
-	_fixtureData.listener = this;
-	_fixtureData.player = this;
-	_fixtureData.type = FixtureDataType::Player;
+	FixtureData* fixtureData = new FixtureData();
+
+	fixtureData->listener = this;
+	fixtureData->player = this;
+	fixtureData->type = FixtureDataType::Player;
 
 	
-	fixtureDef.userData.pointer = (uintptr_t)&_fixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
+	fixtureDef.userData.pointer = (uintptr_t)fixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
 	fixtureDef.density = 1.f; // 밀도
 	fixtureDef.friction = 0.f; // 마찰
 
@@ -43,37 +45,52 @@ void Player::Begin()
 	fixtureDef.shape = &polygonShape;
 	body->CreateFixture(&fixtureDef);
 
-	// 캐릭터 발 밑에 설치할 sensor (땅에 닿을 때 점프 처리를 위한 sensor)
+	// unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+	unique_ptr<FixtureData> fixtureDataPtr(fixtureData);
+	Physics::AddFixtureData(move(fixtureDataPtr));
 
+	// 캐릭터 발 밑에 설치할 sensor (땅에 닿을 때 점프 처리를 위한 sensor)
 	b2FixtureDef sensorFixtureDef;
 	b2PolygonShape sensorPolygonShape;
 
-	_sensorFixtureData.listener = this;
-	_sensorFixtureData.player = this;
-	_sensorFixtureData.type = FixtureDataType::PlayerSensor;
+	FixtureData* sensorFixtureData = new FixtureData();
 
-	sensorFixtureDef.userData.pointer = (uintptr_t)&_sensorFixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
+	sensorFixtureData->listener = this;
+	sensorFixtureData->player = this;
+	sensorFixtureData->type = FixtureDataType::PlayerSensor;
+
+	sensorFixtureDef.userData.pointer = (uintptr_t)sensorFixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
 	sensorPolygonShape.SetAsBox(PLAYER_SENSOR_HX, PLAYER_SENSOR_HY, b2Vec2(0.f, PLAYER_SIZE_HEIGHT / 2.f), 0.f);
 	sensorFixtureDef.isSensor = true; // sensor : 충돌을 감지하지만 물리적인 상호작용은 하지 않는 특수한 fixture
 	sensorFixtureDef.shape = &sensorPolygonShape;
 
 	body->CreateFixture(&sensorFixtureDef);
 
+	// unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+	unique_ptr<FixtureData> sensorFixtureDataPtr(sensorFixtureData);
+	Physics::AddFixtureData(move(sensorFixtureDataPtr));
+
 	// 캐릭터 머리 부분에 설치할 sensor
 
 	b2FixtureDef headSensorFixtureDef;
 	b2PolygonShape headSensorPolygonShape;
 
-	_headSensorFixtureData.listener = this;
-	_headSensorFixtureData.player = this;
-	_headSensorFixtureData.type = FixtureDataType::PlayerHeadSensor;
+	FixtureData* headFixtureData = new FixtureData();
 
-	headSensorFixtureDef.userData.pointer = (uintptr_t)&_headSensorFixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
+	headFixtureData->listener = this;
+	headFixtureData->player = this;
+	headFixtureData->type = FixtureDataType::PlayerHeadSensor;
+
+	headSensorFixtureDef.userData.pointer = (uintptr_t)headFixtureData; // 차후 Contact 상황 등에서 fixture를 통해 fixtureData 접근 가능
 	headSensorPolygonShape.SetAsBox(PLAYER_HEAD_SENSOR_HX, PLAYER_HEAD_SENSOR_HY, b2Vec2(0.f, -PLAYER_SIZE_HEIGHT / 2.f), 0.f);
 	headSensorFixtureDef.isSensor = true; // sensor : 충돌을 감지하지만 물리적인 상호작용은 하지 않는 특수한 fixture
 	headSensorFixtureDef.shape = &headSensorPolygonShape;
 
 	body->CreateFixture(&headSensorFixtureDef);
+
+	// unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+	unique_ptr<FixtureData> headFixtureDataPtr(headFixtureData);
+	Physics::AddFixtureData(move(headFixtureDataPtr));
 
 	// 이외 멤버함수 초기화
 	_hp = PLAYER_MAX_HP;

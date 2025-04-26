@@ -36,5 +36,4 @@ protected:
 	Animation _animation; // 스킬 사용 animation
 
 	b2Body* _attackBody; // b2body for attack box
-	FixtureData _attackFixtureData; // FixtureData for attack box
 };

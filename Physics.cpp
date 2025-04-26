@@ -4,6 +4,7 @@ b2World* Physics::world; // static 정의
 b2Draw* Physics::debugDraw; // static 정의
 set<b2Body*> Physics::bodiesToDestroy; // static 정의
 set<pair<b2Body*, bool>> Physics::bodiesSetEnabled;
+vector<unique_ptr<FixtureData>> Physics::fixtureDataList;
 
 void Physics::Init()
 {
@@ -12,6 +13,7 @@ void Physics::Init()
 
 	bodiesToDestroy.clear();
 	bodiesSetEnabled.clear();
+	fixtureDataList.clear();
 
 	world = new b2World(b2Vec2(WORLD_GRAVITY_X, WORLD_GRAVITY_Y));
 	world->SetDebugDraw(debugDraw);
@@ -21,6 +23,8 @@ void Physics::Init()
 
 void Physics::Update(float deltaTime)
 {
+	if (!world) return;
+
 	// 물리 세계에서 한 프레임만큼 물리 시뮬레이션을 진행
 	world->Step(deltaTime, WORLD_VELOCITY_ITERATION, WORLD_POSITION_ITERATION); // deltaTime 경과에 따른 속도와 위치 업데이트 (속도 및 위치 계산을 위한 연산 횟수)
 	
@@ -53,4 +57,26 @@ void Physics::DebugDraw(Renderer& renderer)
 	}
 
 	world->DebugDraw();
+}
+
+void Physics::Shutdown()
+{
+	if (!world) return;
+
+	cout << "Destroying Physics world..." << endl;
+
+	for (b2Body* body = world->GetBodyList(); body; body = body->GetNext()) {
+		for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+			if (fixture->GetUserData().pointer) fixture->GetUserData().pointer = 0; // Dangling pointer 방지
+		}
+	}
+
+	delete world;
+	world = nullptr;
+	fixtureDataList.clear(); // 모든 FixtureData 소멸 (unique_ptr로 관리되던 객체가 안전하게 메모리 해제됨)
+}
+
+void Physics::AddFixtureData(unique_ptr<FixtureData> fixtureData)
+{
+	fixtureDataList.push_back(move(fixtureData)); // fixtureData 소유권을 fixtureDataList로 이전
 }

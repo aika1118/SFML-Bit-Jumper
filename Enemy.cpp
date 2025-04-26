@@ -20,8 +20,10 @@ void Enemy::Begin()
 
 	_tag = "enemy";
 
-	_fixtureData.object = this;
-	_fixtureData.type = FixtureDataType::Object;
+	FixtureData* fixtureData = new FixtureData();
+
+	fixtureData->object = this;
+	fixtureData->type = FixtureDataType::Object;
 
 	// 기존 _body는 Physics::Init()에서 초기화됨
 
@@ -39,11 +41,15 @@ void Enemy::Begin()
 	circleShape.m_radius = ENEMY_RADIUS;
 
 	b2FixtureDef fixtureDef;
-	fixtureDef.userData.pointer = (uintptr_t)&_fixtureData;
+	fixtureDef.userData.pointer = (uintptr_t)fixtureData;
 	fixtureDef.shape = &circleShape;
 	fixtureDef.density = 1.f;
 	fixtureDef.friction = 0.f;
 	_body->CreateFixture(&fixtureDef);
+
+	// unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+	unique_ptr<FixtureData> fixtureDataPtr(fixtureData);
+	Physics::AddFixtureData(move(fixtureDataPtr));
 
 }
 
@@ -51,7 +57,7 @@ void Enemy::Update(float deltaTime)
 {
 	if (!_isActive) return;
 
-	if (_isDead)
+	if (_isDead) // ENEMY_DESTROY_TIME 동안 죽은 이미지만 렌더링
 	{
 		_destroyTimer += deltaTime;
 		if (_destroyTimer >= ENEMY_DESTROY_TIME) _isActive = false;

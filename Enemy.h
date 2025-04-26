@@ -35,7 +35,6 @@ private:
 	bool _isDead;
 	float _destroyTimer; // 죽은 후 얼마나 texture를 노출시킬지 관리하는 변수
 	bool _facingLeft;
-	FixtureData _fixtureData;
 	bool _isActive;
 	Vector2f _spawnPosition;
 

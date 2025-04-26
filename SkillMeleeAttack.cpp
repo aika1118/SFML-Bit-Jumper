@@ -23,18 +23,24 @@ void SkillMeleeAttack::Begin()
 	b2PolygonShape sensorShape;
 	sensorShape.SetAsBox(MAP_CELL_SIZE / 2.f, MAP_CELL_SIZE / 2.f);
 
+	FixtureData* fixtureData = new FixtureData();
+
 	// fixture for attack box
-	_attackFixtureData.listener = &(Game::getInstance().getPlayer());
-	_attackFixtureData.player = &(Game::getInstance().getPlayer());
-	_attackFixtureData.type = FixtureDataType::Attack;
-	_attackFixtureData.isSkillAttacked = false;
+	fixtureData->listener = &(Game::getInstance().getPlayer());
+	fixtureData->player = &(Game::getInstance().getPlayer());
+	fixtureData->type = FixtureDataType::Attack;
+	fixtureData->isSkillAttacked = false;
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &sensorShape;
 	fixtureDef.isSensor = true;
-	fixtureDef.userData.pointer = (uintptr_t)&_attackFixtureData;
+	fixtureDef.userData.pointer = (uintptr_t)fixtureData;
 
 	_attackBody->CreateFixture(&fixtureDef);
+
+	// unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+	unique_ptr<FixtureData> fixtureDataPtr(fixtureData);
+	Physics::AddFixtureData(move(fixtureDataPtr));
 }
 
 void SkillMeleeAttack::Update(float deltaTime)

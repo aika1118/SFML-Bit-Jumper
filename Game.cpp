@@ -274,11 +274,13 @@ void Game::Update(float deltaTime, RenderWindow& window)
 		return;
 	}
 
+	// 게임 종료 후 클리어메뉴에 있을 때 메모리 해제 작업 등
 	if (_menuState == MenuIndex::CLEAR_MENU)
 	{
 		Game::getInstance().InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)
-		Physics::Init(); // 기존 world 초기화
-		player = Player(); // 임시 객체를 생성하고, 복사 대입 연산자로 새로 초기화
+		Physics::Shutdown(); // 기존 world 삭제처리
+		//Resources::_textures.clear(); // texture는 게임 시작 시 최초 한번 초기화 하고 계속 사용하고 있으니 스테이지 종료 후 별도로 초기화하지 않음
+		return;
 	}
 
 	if (MenuManager::getInstance().isInMenu()) return;
@@ -384,13 +386,15 @@ void Game::DeleteObject(Object* object)
 
 void Game::InitObject()
 {
+	if (!Physics::world) return; // 이미 월드가 삭제되어 있으면 return 처리
+
 	// object 관리하는 모든 것들 초기화
 
 	Physics::bodiesToDestroy.clear();
 	Physics::bodiesSetEnabled.clear();
 
 	for (Object* object : _objects)
-		delete object;
+		delete object; // 소멸자 호출 + 메모리 정리
 	
 	_objects.clear();
 }

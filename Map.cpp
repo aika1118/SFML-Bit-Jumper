@@ -121,6 +121,10 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 fixtureDef.shape = &chain;
                 body->CreateFixture(&fixtureDef);
 
+                // unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+                unique_ptr<FixtureData> fixtureDataPtr(fixtureData);
+                Physics::AddFixtureData(move(fixtureDataPtr));
+
                 continue;
             }
 
@@ -147,6 +151,10 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 
                 body->CreateFixture(&sensorFixtureDef);
 
+                // unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+                unique_ptr<FixtureData> fixtureDataPtr(fixtureData);
+                Physics::AddFixtureData(move(fixtureDataPtr));
+
                 continue;
             }
 
@@ -171,6 +179,10 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 sensorFixtureDef.shape = &sensorPolygonShape;
 
                 body->CreateFixture(&sensorFixtureDef);
+
+                // unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+                unique_ptr<FixtureData> fixtureDataPtr(fixtureData);
+                Physics::AddFixtureData(move(fixtureDataPtr));
 
                 continue;
             }
@@ -206,6 +218,10 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 body->CreateFixture(&fixtureDef);
 
                 bodies["lock"].push_back(body);
+
+                // unique_ptr로 래핑 후 Physics로 소유권 이동 (Physics에서 모두 관리하도록 하여 스테이지 종료 후 안전하게 메모리 해제되도록 함)
+                unique_ptr<FixtureData> fixtureDataPtr(fixtureData);
+                Physics::AddFixtureData(move(fixtureDataPtr));
 
                 continue;
             }
