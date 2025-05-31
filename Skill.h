@@ -1,3 +1,5 @@
+// 현재 미사용 class
+
 #pragma once
 #include "Animation.h"
 #include "Renderer.h"

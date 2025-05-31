@@ -1,11 +1,5 @@
 #include "Physics.h"
 
-b2World* Physics::world; // static 정의
-b2Draw* Physics::debugDraw; // static 정의
-set<b2Body*> Physics::bodiesToDestroy; // static 정의
-set<pair<b2Body*, bool>> Physics::bodiesSetEnabled;
-vector<unique_ptr<FixtureData>> Physics::fixtureDataList;
-
 void Physics::Init()
 {
 	if (world)

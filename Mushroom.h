@@ -8,8 +8,19 @@
 class Mushroom : public Object
 {
 public:
+	/**
+	 * @brief mushroom 초기화시 호출
+	 */
 	void Begin() override;
+	/**
+	 * @brief mushroom 상태 업데이트
+	 * @param deltaTime 두 프레임 차이 시간
+	 */
 	void Update(float deltaTime) override;
+	/**
+	 * @brief mushroom 렌더링
+	 * @param renderer 렌더링을 위한 object
+	 */
 	void Render(Renderer& renderer) override;
 
 private:

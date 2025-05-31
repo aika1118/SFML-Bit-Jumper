@@ -9,6 +9,7 @@ string Map::getMapImages(int stage)
 
 Map::Map()
 {
+    // 스테이지 별 맵 이미지 저장
     for (int i = MapType::STAGE_1; i < MapType::END_OF_MAP_INDEX; ++i)
         mapImages[i] = MAP_BASE_PATH + "STAGE_" + to_string(i + 1) + ".png";
 }
@@ -32,6 +33,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 
     Vector2f playerPosition;
 
+    // 픽셀별 color에 따라 texture 지정
     for (int x = 0; x < _grid.size(); ++x)
     {
         for (int y = 0; y < _grid[x].size(); ++y) 
@@ -42,18 +44,22 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 
             Object* object = nullptr;
 
+            // player 위치 지정
             if (color == Color::Red)
             {
                 Game::getInstance()._playerPosition = Vector2f(_cellSize * x + _cellSize / 2.f, _cellSize * y + _cellSize / 2.f);
                 continue;
             }
 
+            // block 지정
             if (color == Color::Black)
                 _grid[x][y] = &Resources::_textures["block.png"];
 
+            // coin 지정
             else if (color == Color::Yellow)
                 object = new Coin();
 
+            // enemy 지정
             else if (color == Color::Blue)
             {
                 // enemy를 pool에서 관리
@@ -63,20 +69,20 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                     cerr << "Failed to spawn enemy at " << _cellSize * x + _cellSize / 2.f << ", " << _cellSize * y + _cellSize / 2.f << endl;
                 }
             }
-            else if (color == Color::Green)
+            else if (color == Color::Green) // 세이브포인트 지정
                 _grid[x][y] = &Resources::_textures["save.png"];
-            else if (color == Color(0, 255, 255))
+            else if (color == Color(0, 255, 255)) // 가시 방해물 지정
                 object = new Spike();
-            else if (color == Color(255, 0, 255))
+            else if (color == Color(255, 0, 255)) // 부딪혀서 깨는 블록 지정
                 object = new BoxFragile();
-            else if (color == Color(200, 200, 200))
+            else if (color == Color(200, 200, 200)) // 출구 지정
 				_grid[x][y] = &Resources::_textures["exit.png"];
-            else if (color == Color(215, 123, 186)) // N개 코인을 먹으면 열리는 블록 (lock은 사라질 수 있는 블록인데 object처럼 관리해야하지 않을까?)
+            else if (color == Color(215, 123, 186)) // N개 코인을 먹으면 열리는 블록 지정 (lock은 사라질 수 있는 블록인데 object처럼 관리해야하지 않을까?)
             { 
                 _grid[x][y] = &Resources::_textures["lock.png"];
                 textures["lock"].push_back({x, y});
             }
-            else if (color == Color(118, 66, 138)) // 먹으면 점프력이 일정시간 높아지는 버섯
+            else if (color == Color(118, 66, 138)) // 먹으면 점프력이 일정시간 높아지는 버섯 지정
             {
 				object = new Mushroom();
             }
@@ -84,7 +90,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
             else
                 continue;
 
-            if (object)
+            if (object) 
             {
                 object->_position = Vector2f(_cellSize * x + _cellSize / 2.f, _cellSize* y + _cellSize / 2.f);
                 objects.push_back(object);
@@ -109,7 +115,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
                 b2ChainShape chain;
                 chain.CreateLoop(&vs[0], 4);
                     
-                FixtureData* fixtureData = new FixtureData(); // FixtureData를 객체 안에 두고 unique_ptr로 객체 소멸 관리해야할듯 함
+                FixtureData* fixtureData = new FixtureData(); 
                 fixtureData->type = FixtureDataType::MapTile;
                 fixtureData->mapX = x;
                 fixtureData->mapY = y;
@@ -240,6 +246,7 @@ void Map::CreateFromImage(const Image& image, vector<Object*>& objects)
 
 void Map::Draw(Renderer& renderer)
 {
+    // 픽셀별 texture 지정된 것을 그림
     int x = 0;
     for (const vector<Texture*>& cells : _grid)
     {

@@ -13,11 +13,40 @@ using namespace std;
 class Camera
 {
 public:
+	/**
+	 * 카메라 객체의 인스턴스를 반환합니다.
+	 *
+	 * @return 카메라 객체의 인스턴스입니다.
+	 *
+	 * @throws 없음
+	 */
 	static Camera& getInstance(); // 싱글톤
-
+	/**
+	 * 현재 뷰의 크기를 반환합니다.
+	 *
+	 * @return 현재 뷰의 크기입니다.
+	 *
+	 * @throws 없음
+	 */
 	Vector2f getViewSize();
-	View getView(Vector2u windowSize); // 현재 windowSize 종횡비에 맞는 view 반환, 맵 바깥을 벗어나지 않는 view 반환
-	View getUIView(); // UI 렌더링을 위한 view 반환
+	/**
+	 * 현재 창 크기에 맞는 뷰를 반환합니다.
+	 *
+	 * @param windowSize 창의 크기입니다.
+	 *
+	 * @return 창 크기에 맞는 뷰입니다.
+	 *
+	 * @throws 없음
+	 */
+	View getView(Vector2u windowSize);
+	/**
+	 * UI 렌더링을 위한 뷰를 반환합니다.
+	 *
+	 * @return UI 렌더링을 위한 뷰입니다.
+	 *
+	 * @throws 없음
+	 */
+	View getUIView();
 	float _zoomLevel = CAMERA_ZOOM_LEVEL; // view 크기
 	Vector2f _position; // view 중심
 

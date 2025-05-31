@@ -71,7 +71,6 @@ void Player::Begin()
 	Physics::AddFixtureData(move(sensorFixtureDataPtr));
 
 	// 캐릭터 머리 부분에 설치할 sensor
-
 	b2FixtureDef headSensorFixtureDef;
 	b2PolygonShape headSensorPolygonShape;
 
@@ -92,7 +91,7 @@ void Player::Begin()
 	unique_ptr<FixtureData> headFixtureDataPtr(headFixtureData);
 	Physics::AddFixtureData(move(headFixtureDataPtr));
 
-	// 이외 멤버함수 초기화
+	// 이외 멤버변수 초기화
 	_hp = PLAYER_MAX_HP;
 	_isDead = false;
 	_playerStatus = PlayerStatus::Idle;
@@ -106,13 +105,13 @@ void Player::Update(float deltaTime)
 	b2Vec2 velocity = body->GetLinearVelocity();
 
 	_timeInOneCycle += deltaTime; // 한 점프 cycle마다 흐르는 time
-	if (fabs(_timeInOneCycle - _timeWhenGrounded) * 1000.f >= GAME_OVER_LIMIT_TIME) // 땅에 머무는 시간이 2초가 지난 경우 timeOver 처리
+	if (fabs(_timeInOneCycle - _timeWhenGrounded) * 1000.f >= GAME_OVER_LIMIT_TIME) // 땅에 머무는 시간이 GAME_OVER_LIMIT_TIME 시간만큼 지난 경우 timeOver 처리
 	{
 		cout << "timeOver !" << endl;
 		_isDead = true;
 	}
 	
-	HandleSkill(deltaTime, velocity); // 키보드 입력에 따라 skill 처리
+	HandleSkill(deltaTime, velocity); // 키보드 입력에 따라 skill 처리 (현재 미사용)
 	HandleMove(deltaTime, velocity); // 키보드 입력에 따라 move 처리
 	HandleJump(velocity); // 키보드 입력에 따라 jump 처리
 	body->SetLinearVelocity(velocity);
@@ -151,7 +150,7 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		{
 			_isFirstGrounded = true;
 			//cout << "First Grounded !" << endl;
-			_timeWhenGrounded = _timeInOneCycle; // 땅이 닿은 시점을 기록 (for 판정)
+			_timeWhenGrounded = _timeInOneCycle; // 땅이 닿은 시점을 기록 (판정 산정을 위함)
 		}
 
 		//cout << "Player is on MapTile. Init Progressed !" << endl;

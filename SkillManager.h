@@ -1,3 +1,5 @@
+// 현재 미사용 class
+
 #pragma once
 
 #include <unordered_map>

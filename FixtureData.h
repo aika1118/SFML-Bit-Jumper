@@ -5,10 +5,12 @@
 
 #pragma once
 
+// 전방선언
 class ContactListener;
 class Player;
 class Object;
 
+// Fixture의 타입
 enum class FixtureDataType
 {
 	Player,

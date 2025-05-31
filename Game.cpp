@@ -4,23 +4,25 @@
 Game::Game() // 참조자 멤버변수 초기화
 	:gameMap(Map::getInstance()), camera(Camera::getInstance())
 {
-	if (Util::checkServerConnection() == false)
+	if (Util::checkServerConnection() == false) // 오프라인 모드일 경우
 	{
 		cout << "Offline Mode !" << endl;
 		_isServerConnected = false;
-		return; // 서버 연결을 원하지 않는 경우 (config.h에서 값 관리)
 	}
 
-	try
+	else
 	{
-		client = new Client(io_context, SERVER_IP, SERVER_PORT); // 클라이언트 생성
-		cout << "Client Connected !" << endl;
-	}
-	catch (const std::exception& e)
-	{
-		cerr << "Exception: " << e.what() << "\n"; // 예외처리
-	}
-
+		try
+		{
+			client = new Client(io_context, SERVER_IP, SERVER_PORT); // 클라이언트 생성
+			cout << "Client Connected !" << endl;
+		}
+		catch (const std::exception& e)
+		{
+			cerr << "Exception: " << e.what() << "\n"; // 예외처리
+		}
+	}	
+	
 	Physics::Init();
 	_enemyPool = new EnemyPool();
 }
@@ -231,7 +233,7 @@ void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정
 
 void Game::Update(float deltaTime, RenderWindow& window)
 {
-	if (_isServerConnected && !_isUidInited) // uid가 초기화 될때까지 해당 if조건에 계속 걸리게됨
+	if (_isServerConnected && !_isUidInited) // uid가 초기화 될때까지 해당 if 조건에 계속 걸리게됨
 	{
 		// 현재 닉네임 생성 메뉴에 있다면 return
 		if (_menuState == MenuIndex::MAKE_USERNAME_MENU) return;
@@ -246,7 +248,7 @@ void Game::Update(float deltaTime, RenderWindow& window)
 			_username = Util::getUserName(_uid); // uid를 얻은 경우 username도 get 하기
 			_menuState = MenuIndex::MAIN_MENU; // 메인 메뉴로 이동
 
-			// uid에 해당하는 최신 clear stage를 아래 const 값으로 초기화 (실제 db값 받기전에 로딩중을 알리는 처리를 하기 위함 in StageMenu.cpp)
+			// uid에 해당하는 최신 clear stage를 init 값으로 초기화 (실제 db값 받기전에 로딩중을 알리는 처리를 하기 위함 in StageMenu.cpp)
 			setPlayerCurrentClearStage(_uid, SETTING_PLAYER_CURRENT_CLEAR_STAGE_NOT_INITED);
 			
 			// uid에 해당하는 최신 clear stage 정보 받아오기
@@ -283,6 +285,7 @@ void Game::Update(float deltaTime, RenderWindow& window)
 		return;
 	}
 
+	// 현재 메뉴에 있으면 아래 게임루프를 업데이트 하지 않음
 	if (MenuManager::getInstance().isInMenu()) return;
 	
 
@@ -303,6 +306,7 @@ void Game::Update(float deltaTime, RenderWindow& window)
 
 void Game::Render(Renderer& renderer)
 {
+	// 메뉴에 있으면 메뉴만 렌더링 하고 return
 	if (MenuManager::getInstance().isInMenu())
 	{
 		renderer._target.setView(renderer._target.getDefaultView()); // 메뉴 UI 표시를 위해 window default view로 회귀
@@ -348,7 +352,7 @@ void Game::RenderUI(Renderer& renderer)
 	playerCoinText.setString("Coin: " + to_string(Game::getInstance().getPlayer().getCoin()));
 	renderer._target.draw(playerCoinText);
 
-	// 게임 일시정지 되었을 때 배경화면 지정
+	// 플레이어 사망 시 배경화면 설정
 	if (player._isDead)
 	{
 		backgroundWhenPaused.setScale(camera.getViewSize());

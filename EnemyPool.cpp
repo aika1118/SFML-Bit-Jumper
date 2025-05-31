@@ -1,7 +1,8 @@
 #include "EnemyPool.h"
 
 EnemyPool::EnemyPool()
-{
+{	
+	// pool 만큼 적을 생성, 그리고 deactivate 처리
 	for (int i = 0; i < ENEMY_POOL_SIZE; ++i)
 	{
 		Enemy* enemy = new Enemy();
@@ -22,7 +23,7 @@ Enemy* EnemyPool::GetAvailableEnemy(Vector2f position)
 {
 	for (Enemy* enemy : enemies)
 	{
-		if (!enemy->IsActive())
+		if (!enemy->IsActive()) // 비활성화 된 적을 activa 처리하여 재사용 진행
 		{
 			enemy->Reset(position);
 			enemy->SetActive(true);
@@ -51,7 +52,7 @@ void EnemyPool::Update(float deltaTime)
 	while (!respawnQueue.empty()) // 모든 리스폰 대상 Enemy에 대해 update 처리
 	{
 		pair<Enemy*, float> pair = respawnQueue.front();
-		pair.second -= deltaTime;
+		pair.second -= deltaTime; // deltaTime 차감 처리
 		if (pair.second <= 0.f) // 리스폰할 때가 찾아옴
 		{
 			pair.first->Reset(pair.first->GetSpawnPosition());
@@ -74,6 +75,7 @@ void EnemyPool::Render(Renderer& renderer)
 {
 	for (Enemy* enemy : enemies)
 	{
+		// 활성화된 적만 렌더링 처리
 		if (enemy->IsActive()) enemy->Render(renderer);
 	}
 }

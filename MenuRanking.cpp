@@ -73,7 +73,7 @@ void MenuRanking::update(RenderWindow& window, const Event& event, float deltaTi
             }
         }
 
-        // 이전 메뉴로 이동
+        // 이전 메뉴인 메인 메뉴로 이동
         if (_returnPageText.getGlobalBounds().contains(mousePos)) 
 		{
 			nextState = MenuIndex::MAIN_MENU;

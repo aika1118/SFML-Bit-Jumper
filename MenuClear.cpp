@@ -67,6 +67,7 @@ void MenuClear::render(Renderer& renderer)
     // score를 현재 클리어한 스테이지 점수를 get한 후 출력
     int id = Game::getInstance().getUid(); // 현재 player id
     int stage = Game::getInstance().getPlayerCurrentClearStage(id); // 현재 player가 클리어한 스테이지
+
     _scoreText.setString("Score : " + to_string(Game::getInstance().getPlayerStageScore(id, stage)));
     _scoreText.setOrigin(_scoreText.getLocalBounds().width / 2, _scoreText.getLocalBounds().height / 2); // text origin 재설정
     _scoreText.setPosition((float)renderer._target.getSize().x / 2, (float)renderer._target.getSize().y / 2 + 20); // text position 재설정

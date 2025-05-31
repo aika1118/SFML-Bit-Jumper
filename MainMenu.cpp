@@ -38,9 +38,10 @@ void MainMenu::init(RenderWindow& window)
 
 void MainMenu::update(RenderWindow& window, const Event& event, float deltaTime, int& nextState)
 {
+    // 왼쪽 마우스를 누른 경우
     if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left)
     {
-        Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+        Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window)); // 마우스 위치 가져오기
         if (_playText.getGlobalBounds().contains(mousePos))
         { 
             nextState = MenuIndex::STAGE_MENU; // StageMenu로 이동
@@ -52,6 +53,7 @@ void MainMenu::update(RenderWindow& window, const Event& event, float deltaTime,
             if (Game::getInstance().isServerConnected() == false) return; // offline 모드인 경우 랭킹 진입을 허용하지 않음
 
             nextState = MenuIndex::RANKING_MENU; // 랭킹 메뉴
+            // 서버 요청으로 랭킹 읽어오기
             Game::getInstance().getClient()->send_packet_async(PACKET_READ_RANKING, "",
                 [](const string& response) { // 콜백 정의
                     cout << "PACKET_READ_RANKING callback!" << endl;
@@ -62,10 +64,10 @@ void MainMenu::update(RenderWindow& window, const Event& event, float deltaTime,
                         return;
                     }
 
-                    // 한줄씩 데이터를 읽어서 username, score 데이터를 parameter로 넘기기 
                     stringstream ss(response);
                     string line;
 
+                    // 한줄씩 데이터를 읽어서 username, score 데이터를 parameter로 넘기기 
                     while (getline(ss, line))
                     {
                         stringstream lineStream(line);

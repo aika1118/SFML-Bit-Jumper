@@ -16,10 +16,45 @@ class Client : public enable_shared_from_this<Client>
 {
 public:
 	using Callback = function<void(const string& response)>; // 콜백함수로 사용 (람다 표현식으로 호환가능)
-
+	/**
+	 * 클라이언트 객체를 생성합니다.
+	 *
+	 * @param io_context I/O 컨텍스트입니다.
+	 * @param host 서버의 호스트입니다.
+	 * @param port 서버의 포트입니다.
+	 *
+	 * @return 없음
+	 *
+	 * @throws 없음
+	 */
 	Client(io_context& io_context, const string& host, const string& port); // 생성자: 서버에 연결
+	/**
+	 * 클라이언트 객체를 소멸합니다.
+	 *
+	 * @return 없음
+	 *
+	 * @throws 없음
+	 */
 	~Client();
+	/**
+	 * 서버에 패킷을 비동기적으로 전송하고 응답을 받는 함수입니다.
+	 *
+	 * @param type 패킷의 타입입니다.
+	 * @param data 패킷의 데이터입니다.
+	 * @param cb 콜백 함수입니다.
+	 *
+	 * @return 없음
+	 *
+	 * @throws 없음
+	 */
 	void send_packet_async(PacketType type, const string& data, Callback cb); // 서버에 패킷을 비동기적으로 전송하고 응답을 받는 함수
+	/**
+	 * 클라이언트가 서버와 연결되어 있는지 확인합니다.
+	 *
+	 * @return 클라이언트가 서버와 연결되어 있으면 true, 그렇지 않으면 false입니다.
+	 *
+	 * @throws 없음
+	 */
 	bool isConnected() const;
 
 private:
@@ -34,6 +69,12 @@ private:
 	string _port;
 	uint32_t _request_counter = 0; // 요청 ID 카운터
 	unordered_map<uint32_t, Callback> _callbacks; // 요청 ID와 콜백 매핑
-
+	/**
+	 * 서버로부터 응답을 받는 함수입니다.
+	 *
+	 * @return 없음
+	 *
+	 * @throws 없음
+	 */
 	void receive_response(); // 서버로부터 응답을 받는 함수
 };

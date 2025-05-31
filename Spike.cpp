@@ -4,10 +4,12 @@ void Spike::Begin()
 {
     _tag = "spike";
 
+    // body 정의 후 wordl에 추가
     b2BodyDef bodyDef;
     bodyDef.position.Set(_position.x, _position.y);
     b2Body* body = Physics::world->CreateBody(&bodyDef);
 
+    // collider 정의
     vector<b2Vec2> vs(4);
     vs[0].Set(-OBJECT_SPIKE_SIZE / 2.f, -OBJECT_SPIKE_SIZE / 2.f);
     vs[1].Set(+OBJECT_SPIKE_SIZE / 2.f, -OBJECT_SPIKE_SIZE / 2.f);
@@ -17,6 +19,7 @@ void Spike::Begin()
     b2ChainShape chain;
     chain.CreateLoop(&vs[0], 4);
 
+    // fixtureData 정의
     FixtureData* fixtureData = new FixtureData();
     fixtureData->type = FixtureDataType::Object;
     fixtureData->object = this;
@@ -34,7 +37,7 @@ void Spike::Begin()
 
 void Spike::Update(float deltaTime)
 {
-	
+	// Update 필요 시 정의
 }
 
 void Spike::Render(Renderer& renderer)

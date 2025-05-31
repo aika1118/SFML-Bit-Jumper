@@ -10,7 +10,7 @@ string Util::floatToString(float num, int digit)
 
 int Util::getUID()
 {
-	ifstream inputFile(SETTING_CONFIG_FILE); // scope 벗어나면 자동 closing
+	ifstream inputFile(SETTING_CONFIG_FILE); // 해당 객체는 scope 벗어나면 자동 closing
 	
 	// SETTING_CONFIG_FILE이 없는 경우 새로 생성
 	if (!inputFile)
@@ -20,7 +20,7 @@ int Util::getUID()
 		json config;
 		config["UID"] = SETTING_UID_NOT_INITED;
 
-		ofstream outputFile(SETTING_CONFIG_FILE); // scope 벗어나면 자동 closing
+		ofstream outputFile(SETTING_CONFIG_FILE); // 해당 객체는 scope 벗어나면 자동 closing
 		outputFile << config.dump(4); // pretty print로 저장
 		cout << "config.json 파일이 생성되었습니다. " << endl;
 
@@ -83,6 +83,7 @@ void Util::setUID(int uid)
 
 string Util::getUserName(int uid)
 {
+	// 필요 시 구현 진행
 	return string();
 }
 
