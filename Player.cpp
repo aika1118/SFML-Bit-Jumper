@@ -183,6 +183,7 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		if (!coin)
 			return;
 		
+		Resources::_sounds["Coin.wav"].play();
 		coin->destroyBody(); // world에서 body를 destroy (정확히는 삭제 대기리스트에만 일단 추가 후 Physics에서 step 계산 후 일괄적으로 destroyBody 진행)
 		Game::getInstance().DeleteObject(otherData->object); // object를 destroy하여 더이상 해당 object에 대해 update, render되지 않도록 함
 
@@ -293,6 +294,8 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 		Game::getInstance()._savePositionX = curSaveX;
 		Game::getInstance()._savePositionY = curSaveY;
 
+		Resources::_sounds["SaveTile.wav"].play();
+
 		return;
 	}
 
@@ -301,6 +304,10 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		cout << "Stage : " << Game::getInstance().getStageSelected() + 1 << " Cleared" << endl;
 		cout << "Current Percentage : " << _judgementPercentage << endl;
+
+		// 사운드 처리
+		Resources::_musics["Music_Game.wav"].stop();
+		Resources::_sounds["Clear.wav"].play();
 
 		// 게임 결과 기록
 
@@ -349,6 +356,7 @@ void Player::OnBeginContact(b2Fixture* self, b2Fixture* other)
 
 		// 별도로 버섯 object를 파괴하지 않고 Mushroom 클래스에서 렌더링만 되지 않도록 처리됨
 		bIsJumpImproved = true;
+		Resources::_sounds["Mushroom.wav"].play();
 		
 
 		cout << "jump improve on" << endl;
@@ -452,18 +460,21 @@ void Player::HandleJump(b2Vec2& velocity)
 			//cout << judgementTime << "ms" << endl;
 			if (judgementTime <= JUDGEMENT_PERFECT || _judgementTotalCnt == 0) // 처음 점프했을 때는 무조건 Perfect 처리
 			{ 
+				Resources::_sounds["Jump_Perfect.wav"].play();
 				_judgementPerfectCnt += 1;
 				_judgementCurrent = "Perfect";
 				cout << "Perfect" << endl;
 			}
 			else if (judgementTime <= JUDGEMENT_GREAT)
 			{
+				Resources::_sounds["Jump_Great.wav"].play();
 				_judgementGreatCnt += 1;
 				_judgementCurrent = "Great";
 				cout << "Great" << endl;
 			}
 			else
 			{
+				Resources::_sounds["Jump_Miss.wav"].play();
 				_judgementMissCnt += 1;
 				_judgementCurrent = "Miss";
 				cout << "Miss" << endl;

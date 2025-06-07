@@ -128,6 +128,12 @@ void Util::setPacketWaitStatus(PacketType packetType, bool status)
 	_PacketWaitStatus[packetType] = status;
 }
 
+void Util::stopSounds()
+{
+	for (auto& music : Resources::_musics) music.second.stop();
+	for (auto& sound : Resources::_sounds) sound.second.stop();
+}
+
 
 
 

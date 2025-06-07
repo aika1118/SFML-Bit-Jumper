@@ -58,6 +58,7 @@ public:
 	* @param status 패킷 대기 상태 (true: 대기중, false: 대기하지 않음)
 	*/
 	static void setPacketWaitStatus(PacketType packetType, bool status);
+	static void stopSounds();
 
 	// static inline 으로 헤더파일에서 선언과 동시에 초기화까지 진행
 	static inline unordered_map<PacketType, bool> _PacketWaitStatus; // 각 PACKET 요청에 대해 기다리고 있는지 상태를 저장 (1 = 기다리는중, 0 = 기다리지 않는중)

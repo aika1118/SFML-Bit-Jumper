@@ -276,6 +276,8 @@ public:
 	 * @return EnemyPool* 적 풀 객체
 	 */
 	EnemyPool* GetEnemyPool();
+	void setWindowClosed(bool flag);
+	bool getWindowClosed();
 
 	Vector2f _playerPosition; // 플레이어 위치
 	int _savePositionX = PLAYER_NO_SAVE_POSITION; // 플레이어 세이브 포인트 위치 X
@@ -319,4 +321,8 @@ private:
 
 	mutex playerCurrentClearStages_mutex_; // _playerCurrentClearStages 자원은 네트워크 쓰레드가 콜백 함수에서 수정을 진행하고 메인 쓰레드에서 읽기 등 작업이 있기 때문에 lock으로 보호
 	EnemyPool* _enemyPool = nullptr;
+
+	Music musicInStage;
+
+	bool _isWindowClosed = false;
 };

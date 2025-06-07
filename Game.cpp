@@ -52,11 +52,36 @@ void Game::Begin(RenderWindow& window)
 			Resources::_textures[file.path().filename().string()].loadFromFile(file.path().string()); // unordered_map에 texture 정보 저장
 	}
 
-	//for (const auto& file : filesystem::directory_iterator("./resources/sounds/")) // sound 불러오기
-	//{
-	//	if (file.is_regular_file() && (file.path().extension() == ".ogg" || file.path().extension() == ".wav"))
-	//		Resources::_sounds[file.path().filename().string()].loadFromFile(file.path().string()); // unordered_map에 texture 정보 저장
-	//}
+	for (const auto& file : filesystem::directory_iterator("./resources/sounds/use/")) // sound 불러오기
+	{
+		if (file.is_regular_file() && (file.path().extension() == ".ogg" || file.path().extension() == ".wav"))
+		{
+			// unordered_map에 sound 정보 저장
+			if (!Resources::soundBuffers[file.path().filename().string()].loadFromFile(file.path().string()))
+			{
+				std::cerr << "Failed to load sound: " << file.path().string() << std::endl;
+				continue;
+			}
+
+			Resources::_sounds[file.path().filename().string()].setBuffer(Resources::soundBuffers[file.path().filename().string()]);
+			Resources::_sounds[file.path().filename().string()].setVolume(VOLUME_SOUND);
+		}
+	}
+
+	for (const auto& file : filesystem::directory_iterator("./resources/musics/use/")) // sound 불러오기
+	{
+		if (file.is_regular_file() && (file.path().extension() == ".ogg" || file.path().extension() == ".wav"))
+		{
+			// unordered_map에 music 정보 저장
+			if (!Resources::_musics[file.path().filename().string()].openFromFile(file.path().string()))
+			{
+				std::cerr << "Failed to load music: " << file.path().string() << std::endl;
+				continue;
+			}
+			Resources::_musics[file.path().filename().string()].setLoop(true);
+			Resources::_musics[file.path().filename().string()].setVolume(VOLUME_MUSIC);
+		}
+	}
 
 	//_mapImage.loadFromFile(MAP_STAGE_1);
 	//_mapBound = FloatRect(0.f, 0.f, (float)_mapImage.getSize().x, (float)_mapImage.getSize().y); // 현재 mapBound 계산 (view가 맵 경계 벗어나지 않도록 하는 작업)
@@ -66,7 +91,6 @@ void Game::Begin(RenderWindow& window)
 		cerr << "font load error!" << endl;
 		return;
 	}
-
 		
 	playerJudgementPercentageText.setFont(font);
 	playerJudgementPercentageText.setFillColor(Color::White);
@@ -102,8 +126,6 @@ void Game::Begin(RenderWindow& window)
 	if (_isServerConnected == false) setPlayerCurrentClearStage(getUid(), PLAYER_DEFAULT_STAGE);
 
 	InitSkill();
-
-	Restart();
 }
 
 void Game::InitSkill()
@@ -214,6 +236,16 @@ EnemyPool* Game::GetEnemyPool()
 	return _enemyPool;
 }
 
+void Game::setWindowClosed(bool flag)
+{
+	_isWindowClosed = flag;
+}
+
+bool Game::getWindowClosed()
+{
+	return _isWindowClosed;
+}
+
 void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정리 필요 (world도 Game 생성자에서 Init하고 Restart()에서 또 Init 되는듯 하여 문제 없을지 확인)
 {
 	cout << "Restart() Called !" << endl;
@@ -229,10 +261,16 @@ void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정
 
 	for (Object* object : _objects)
 		object->Begin();
+
+	// 메뉴 bgm 정지 후 인게임 bgm 출력
+	if (Resources::_musics["Music_Menu.wav"].getStatus() == Music::Playing) Resources::_musics["Music_Menu.wav"].stop();
+	Resources::_musics["Music_Game.wav"].play();
 }
 
 void Game::Update(float deltaTime, RenderWindow& window)
 {
+	if (getWindowClosed() == true) return; // 게임 window가 닫힌경우 더이상 game 업데이트 하지 않음
+
 	if (_isServerConnected && !_isUidInited) // uid가 초기화 될때까지 해당 if 조건에 계속 걸리게됨
 	{
 		// 현재 닉네임 생성 메뉴에 있다면 return
@@ -273,6 +311,7 @@ void Game::Update(float deltaTime, RenderWindow& window)
 	if (_menuState == MenuIndex::EXIT)
 	{
 		window.close();
+		Util::stopSounds();
 		return;
 	}
 
@@ -285,15 +324,31 @@ void Game::Update(float deltaTime, RenderWindow& window)
 		return;
 	}
 
-	// 현재 메뉴에 있으면 아래 게임루프를 업데이트 하지 않음
-	if (MenuManager::getInstance().isInMenu()) return;
+	// 현재 메뉴에 있으면 아래 게임루프를 업데이트 하지 않음 (CLEAR_MENU는 위에 if문에서 이미 return 처리되고 있음)
+	if (MenuManager::getInstance().isInMenu()) 
+	{
+		// 메뉴 전용 bgm 출력
+		if (Resources::_musics["Music_Menu.wav"].getStatus() == Music::Stopped) 
+		{
+			Resources::_musics["Music_Menu.wav"].play();
+		}
+		return;
+	}
 	
 
 	if (player._isDead && Keyboard::isKeyPressed(Keyboard::Enter)) // 플레이어 사망상태에서 Enter 눌러서 재시작
 		Restart(); 
 
 	if (player._isDead) // player 사망상태에서는 update 하지 않음
+	{	
+		// 배경음 재생중이라면 정지 후 사망 bgm 출력
+		if (Resources::_musics["Music_Game.wav"].getStatus() == Music::Playing) 
+		{
+			Resources::_musics["Music_Game.wav"].stop();	
+			Resources::_sounds["Dead.wav"].play();
+		}
 		return;
+	}
 
 	Physics::Update(deltaTime);
 	player.Update(deltaTime);

@@ -30,7 +30,12 @@ int main()
 		{
 			if (event.type == Event::Closed)
 			{
+				// 창 닫기
 				window.close();
+				Game::getInstance().setWindowClosed(true);
+
+				// 재생중인 음악 정지
+				Util::stopSounds();
 			}
 
 			if (MenuManager::getInstance().isInMenu())

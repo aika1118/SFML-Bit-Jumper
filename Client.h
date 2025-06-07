@@ -58,6 +58,15 @@ public:
 	bool isConnected() const;
 
 private:
+	/**
+	 * 서버로부터 응답을 받는 함수입니다.
+	 *
+	 * @return 없음
+	 *
+	 * @throws 없음
+	 */
+	void receive_response(); // 서버로부터 응답을 받는 함수
+
 	tcp::socket _socket; // 서버와 통신할 소켓
 	//tcp::resolver _resolver; // 호스트와 포트를 resolve (DNS 조회를 통해 도메인 이름을 IP 주소로 resolve)
 	io_context& _io_context; // 작업 큐 역할을 하며, 비동기 작업을 큐에 등록
@@ -69,12 +78,5 @@ private:
 	string _port;
 	uint32_t _request_counter = 0; // 요청 ID 카운터
 	unordered_map<uint32_t, Callback> _callbacks; // 요청 ID와 콜백 매핑
-	/**
-	 * 서버로부터 응답을 받는 함수입니다.
-	 *
-	 * @return 없음
-	 *
-	 * @throws 없음
-	 */
-	void receive_response(); // 서버로부터 응답을 받는 함수
+
 };
