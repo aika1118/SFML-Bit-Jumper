@@ -91,6 +91,8 @@ void Game::Begin(RenderWindow& window)
 		cerr << "font load error!" << endl;
 		return;
 	}
+
+	// Text 초기화 하는거 함수화 필요
 		
 	playerJudgementPercentageText.setFont(font);
 	playerJudgementPercentageText.setFillColor(Color::White);
@@ -109,6 +111,30 @@ void Game::Begin(RenderWindow& window)
 	gameOverText.setOutlineColor(Color::Black);
 	gameOverText.setOutlineThickness(1.f);
 	gameOverText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
+
+	continueText.setFont(font);
+	continueText.setFillColor(Color::White);
+	continueText.setOutlineColor(Color::Black);
+	continueText.setOutlineThickness(1.f);
+	continueText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
+	continueText.setString("Continue");
+	continueText.setOrigin(continueText.getLocalBounds().left + continueText.getLocalBounds().width / 2.0f, continueText.getLocalBounds().top + continueText.getLocalBounds().height / 2.0f);
+
+	restartText.setFont(font);
+	restartText.setFillColor(Color::White);
+	restartText.setOutlineColor(Color::Black);
+	restartText.setOutlineThickness(1.f);
+	restartText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
+	restartText.setString("Restart");
+	restartText.setOrigin(restartText.getLocalBounds().left + restartText.getLocalBounds().width / 2.0f, restartText.getLocalBounds().top + restartText.getLocalBounds().height / 2.0f);
+
+	exitText.setFont(font);
+	exitText.setFillColor(Color::White);
+	exitText.setOutlineColor(Color::Black);
+	exitText.setOutlineThickness(1.f);
+	exitText.setScale(UI_CHARACTER_SCALE, UI_CHARACTER_SCALE);
+	exitText.setString("Exit");
+	exitText.setOrigin(exitText.getLocalBounds().left + exitText.getLocalBounds().width / 2.0f, exitText.getLocalBounds().top + exitText.getLocalBounds().height / 2.0f);
 
 	playerCoinText.setFont(font);
 	playerCoinText.setFillColor(Color::White);
@@ -253,6 +279,10 @@ void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정
 	Physics::Init(); // 기존 world 초기화
 	_enemyPool->Reset(); // enemyPool 초기화
 
+	// 세이브 포인트 초기화
+	_savePositionX = PLAYER_NO_SAVE_POSITION;
+	_savePositionY = PLAYER_NO_SAVE_POSITION;
+
 	player = Player(); // 임시 객체를 생성하고, 복사 대입 연산자로 새로 초기화
 	gameMap.CreateFromImage(_mapImage, _objects); // map 따라 player 위치 및 object 생성
 
@@ -262,14 +292,27 @@ void Game::Restart() // Begin할 때의 Restart()가 뭔가 중복되는 것 같아서 코드 정
 	for (Object* object : _objects)
 		object->Begin();
 
+	
+
 	// 메뉴 bgm 정지 후 인게임 bgm 출력
 	if (Resources::_musics["Music_Menu.wav"].getStatus() == Music::Playing) Resources::_musics["Music_Menu.wav"].stop();
 	Resources::_musics["Music_Game.wav"].play();
+
+	_isGameResourceCleaned = false; // 게임 종료 후 리소스 정리 여부를 체크하는 flag
 }
 
 void Game::Update(float deltaTime, RenderWindow& window)
 {
 	if (getWindowClosed() == true) return; // 게임 window가 닫힌경우 더이상 game 업데이트 하지 않음
+
+	if (_paused) return; // pause 상황이면 game 업데이트 하지 않음
+
+	// ESC 키를 눌러 pause 한 경우
+	if (!_paused && Keyboard::isKeyPressed(Keyboard::Escape))
+	{
+		_paused = !_paused;
+		cout << "Paused !" << endl;
+	}
 
 	if (_isServerConnected && !_isUidInited) // uid가 초기화 될때까지 해당 if 조건에 계속 걸리게됨
 	{
@@ -315,19 +358,21 @@ void Game::Update(float deltaTime, RenderWindow& window)
 		return;
 	}
 
-	// 게임 종료 후 클리어메뉴에 있을 때 메모리 해제 작업 등
-	if (_menuState == MenuIndex::CLEAR_MENU)
-	{
-		Game::getInstance().InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)
-		Physics::Shutdown(); // 기존 world 삭제처리
-		//Resources::_textures.clear(); // texture는 게임 시작 시 최초 한번 초기화 하고 계속 사용하고 있으니 스테이지 종료 후 별도로 초기화하지 않음
-		return;
-	}
-
 	// 현재 메뉴에 있으면 아래 게임루프를 업데이트 하지 않음 (CLEAR_MENU는 위에 if문에서 이미 return 처리되고 있음)
 	if (MenuManager::getInstance().isInMenu()) 
 	{
-		// 메뉴 전용 bgm 출력
+		if (!_isGameResourceCleaned)
+		{
+			Game::getInstance().InitObject();  // 현재 world의 object 관련 정보를 담고있는 vector 초기화 (restart 후 이전 object들은 렌더링 되지 않도록)
+			Physics::Shutdown(); // 기존 world 삭제처리
+			//Resources::_textures.clear(); // texture는 게임 시작 시 최초 한번 초기화 하고 계속 사용하고 있으니 스테이지 종료 후 별도로 초기화하지 않음
+			_isGameResourceCleaned = true;
+			cout << "Game Resource Cleaned after game played !" << endl;
+		}
+
+		if (_menuState == MenuIndex::CLEAR_MENU) return;
+
+		// 클리어 메뉴를 제외한 임의의 메뉴에 있다면 전용 bgm 출력
 		if (Resources::_musics["Music_Menu.wav"].getStatus() == Music::Stopped) 
 		{
 			Resources::_musics["Music_Menu.wav"].play();
@@ -419,6 +464,59 @@ void Game::RenderUI(Renderer& renderer)
 		FloatRect textBounds = gameOverText.getLocalBounds();
 		gameOverText.setOrigin(textBounds.left + textBounds.width / 2.0f, textBounds.top + textBounds.height / 2.0f);
 		renderer._target.draw(gameOverText);
+	}
+
+	// 게임 정지 시 선택지 제공
+	if (_paused)
+	{
+		backgroundWhenPaused.setScale(camera.getViewSize());
+		renderer._target.draw(backgroundWhenPaused);
+
+		// Continue
+		continueText.setPosition(Vector2f(0.f, - camera.getViewSize().y / 2.f) + Vector2f(0.f, 20.f));
+		renderer._target.draw(continueText);
+
+		// Restart
+		restartText.setPosition(Vector2f(0.f, -camera.getViewSize().y / 2.f) + Vector2f(0.f, 30.f));
+		renderer._target.draw(restartText);
+
+		// Exit
+		exitText.setPosition(Vector2f(0.f, -camera.getViewSize().y / 2.f) + Vector2f(0.f, 40.f));
+		renderer._target.draw(exitText);
+
+		// 왼쪽 마우스를 누른 경우
+		if (Mouse::isButtonPressed(Mouse::Left))
+		{
+			const RenderWindow* window = dynamic_cast<RenderWindow*>(&renderer._target);
+			if (!window) return;
+			Vector2f mousePos = renderer._target.mapPixelToCoords(Mouse::getPosition(*window)); // 마우스 위치 가져오기
+
+			// Continue 클릭 처리 => 다시 게임으로 돌아감
+			if (continueText.getGlobalBounds().contains(mousePos))
+			{
+				_paused = false;
+				return;
+			}
+
+			// Restart 클릭 처리 => 게임을 재시작함
+			if (restartText.getGlobalBounds().contains(mousePos))
+			{
+				_paused = false;
+				Restart();
+				return;
+			}
+
+			// Exit 클릭 처리 => 스테이지 선택 메뉴로 돌아감
+			if (exitText.getGlobalBounds().contains(mousePos))
+			{
+				_paused = false;
+				Resources::_musics["Music_Game.wav"].stop();
+				setMenuState(MenuIndex::STAGE_MENU);
+				return;
+			}
+			
+			
+		}
 	}
 }
 

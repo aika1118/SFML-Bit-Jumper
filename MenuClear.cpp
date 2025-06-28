@@ -46,11 +46,18 @@ void MenuClear::update(RenderWindow& window, const Event& event, float deltaTime
     // 아직 패킷 요청에 대해 wait 상태인 경우 로딩중 처리
     if (Util::getPacketWaitStatus(PACKET_WRITE) == true) return;
 
+    // 마우스 클릭으로 선택하는 경우
     if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left)
     {
         Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
        if (_okText.getGlobalBounds().contains(mousePos)) // OK 영역을 클릭한 경우
             nextState = MenuIndex::STAGE_MENU; // 스테이지 선택 메뉴로 돌아감
+    }
+
+    // 키보드 조작으로 선택하는 경우
+    if (Keyboard::isKeyPressed(Keyboard::Enter))
+    {
+		nextState = MenuIndex::STAGE_MENU;
     }
 }
 

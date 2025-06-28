@@ -51,7 +51,7 @@ public:
 	 * @param deltaTime 이전 프레임 이후 경과된 시간
 	 * @param window 렌더링에 사용할 RenderWindow 객체
 	 */
-	void Update(float deltaTime, RenderWindow& window); 
+	void Update(float deltaTime, RenderWindow& window);
 	/**
 	 * @brief 게임을 렌더링합니다.
 	 *
@@ -299,6 +299,9 @@ private:
 	Text playerJudgementText;
 	Text playerCoinText;
 	Text gameOverText;
+	Text continueText;
+	Text restartText;
+	Text exitText;
 
 	RectangleShape backgroundWhenPaused; // 일시정지할 때의 배경
 
@@ -325,4 +328,6 @@ private:
 	Music musicInStage;
 
 	bool _isWindowClosed = false;
+	bool _paused = false;
+	bool _isGameResourceCleaned = true; // 게임 종료 후 리소스 정리를 위한 flag (최초 게임 시작시에는 정리할 리소스가 없으니 true로 초기값 줌)
 };
