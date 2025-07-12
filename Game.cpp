@@ -448,9 +448,9 @@ void Game::RenderUI(Renderer& renderer)
 	renderer._target.draw(playerJudgementText);
 
 	// 코인 획득 수 렌더링
-	playerCoinText.setPosition(Vector2f(camera.getViewSize().x / 2.f, -camera.getViewSize().y / 2.f) + Vector2f(-13.f, 1.f));
+	/*playerCoinText.setPosition(Vector2f(camera.getViewSize().x / 2.f, -camera.getViewSize().y / 2.f) + Vector2f(-13.f, 1.f));
 	playerCoinText.setString("Coin: " + to_string(Game::getInstance().getPlayer().getCoin()));
-	renderer._target.draw(playerCoinText);
+	renderer._target.draw(playerCoinText);*/
 
 	// 플레이어 사망 시 배경화면 설정
 	if (player._isDead)
