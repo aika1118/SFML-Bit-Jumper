@@ -1,6 +1,5 @@
 #include "Game.h"
 
-
 Game::Game() // 참조자 멤버변수 초기화
 	:gameMap(Map::getInstance()), camera(Camera::getInstance())
 {
