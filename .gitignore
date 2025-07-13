@@ -381,3 +381,7 @@ latex/
 # skill code
 skill*
 .skill/
+
+# Etc
+ProjectW*
+json.hpp
