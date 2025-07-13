@@ -373,3 +373,10 @@ resources/
 # Config file
 Config.h
 config.json
+
+# Doxygen
+html/
+latex/
+
+# skill code
+skill*
